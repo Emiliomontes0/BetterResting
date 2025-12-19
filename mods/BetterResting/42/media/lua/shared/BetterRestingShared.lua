@@ -20,9 +20,9 @@ BetterResting.Config = {
     VehicleStaminaConsumptionReduction = 0.5, -- 50% reduction while in vehicle
     
     -- Bed bonuses
-    BedStaminaRegenMultiplier = 3.0,
-    BedHPRegenMultiplier = 1.3,               -- 30% faster HP regen
-    BedMuscleFatigueReduction = 0.15,         -- 15% faster muscle fatigue recovery per hour
+    BedStaminaRegenMultiplier = 3.0,          -- 3x faster stamina regen in bed
+    BedHPRegenMultiplier = 2.0,               -- 2x faster HP regen (gradual healing)
+    BedMuscleFatigueReduction = 0.15,         -- 15% faster muscle fatigue recovery
 
 }
 

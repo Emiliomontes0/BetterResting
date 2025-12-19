@@ -1,10 +1,27 @@
-# BetterResting Mod Setup Guide (Mac)
+# BetterResting Mod Setup Guide
 
 ## Quick Start
 
 ### Step 1: Locate Project Zomboid Mods Directory
 
-On Mac, Project Zomboid stores mods in:
+**On Windows:**
+Project Zomboid stores mods in:
+```
+C:\Users\[YourUsername]\Zomboid\mods\
+```
+
+For example, if your username is `Emilio`:
+```
+C:\Users\Emilio\Zomboid\mods\
+```
+
+**To open this directory:**
+1. Press `Windows Key + R` to open Run dialog
+2. Type: `%USERPROFILE%\Zomboid\mods`
+3. Press Enter
+
+**On Mac:**
+Project Zomboid stores mods in:
 ```
 ~/Zomboid/mods/
 ```
@@ -14,20 +31,31 @@ To open this directory in Finder:
 2. Type: `~/Zomboid/mods/`
 3. Press Enter
 
-If the `mods` folder doesn't exist, create it:
-```bash
-mkdir -p ~/Zomboid/mods
-```
+**If the `mods` folder doesn't exist, create it:**
+- **Windows**: The folder will be created automatically when you copy the mod, or create it manually in File Explorer
+- **Mac**: Run `mkdir -p ~/Zomboid/mods` in Terminal
 
 ### Step 2: Install Your Mod
 
-**Option A: Symlink (Recommended for Development)**
+**Windows - Copy Method (Recommended):**
+1. Navigate to your mod folder: `C:\Users\Emilio\Desktop\BetterResting\mods\BetterResting`
+2. Copy the entire `BetterResting` folder
+3. Paste it into `C:\Users\Emilio\Zomboid\mods\`
+4. The final path should be: `C:\Users\Emilio\Zomboid\mods\BetterResting\`
+
+**Windows - Using Command Prompt or PowerShell:**
+```powershell
+# Open PowerShell and run:
+xcopy "C:\Users\Emilio\Desktop\BetterResting\mods\BetterResting" "C:\Users\Emilio\Zomboid\mods\BetterResting\" /E /I
+```
+
+**Mac - Option A: Symlink (Recommended for Development)**
 ```bash
 # This creates a symbolic link so changes are reflected immediately
 ln -s /Users/emiliomontes/Desktop/projects/BetterResting ~/Zomboid/mods/BetterResting
 ```
 
-**Option B: Copy (For Distribution)**
+**Mac - Option B: Copy (For Distribution)**
 ```bash
 # Copy the entire mod folder
 cp -r /Users/emiliomontes/Desktop/projects/BetterResting ~/Zomboid/mods/BetterResting
@@ -36,19 +64,39 @@ cp -r /Users/emiliomontes/Desktop/projects/BetterResting ~/Zomboid/mods/BetterRe
 ### Step 3: Verify Installation
 
 Check that your mod structure looks like this:
+
+**Windows:**
+```
+C:\Users\Emilio\Zomboid\mods\BetterResting\
+├── mod.info
+├── 42\
+│   ├── lua\
+│   │   ├── client\
+│   │   │   └── BetterRestingClient.lua
+│   │   ├── server\
+│   │   │   └── BetterRestingServer.lua
+│   │   └── shared\
+│   │       └── BetterRestingShared.lua
+│   └── media\
+├── common\
+└── [other files]
+```
+
+**Mac:**
 ```
 ~/Zomboid/mods/BetterResting/
 ├── mod.info
-├── lua/
-│   ├── client/
-│   │   └── BetterRestingClient.lua
-│   ├── server/
-│   │   └── BetterRestingServer.lua
-│   └── shared/
-│       └── BetterRestingShared.lua
-├── media/
-├── README.md
-└── SETUP.md
+├── 42/
+│   ├── lua/
+│   │   ├── client/
+│   │   │   └── BetterRestingClient.lua
+│   │   ├── server/
+│   │   │   └── BetterRestingServer.lua
+│   │   └── shared/
+│   │       └── BetterRestingShared.lua
+│   └── media/
+├── common/
+└── [other files]
 ```
 
 ### Step 4: Enable the Mod
@@ -69,8 +117,20 @@ If you used a symlink (Option A), changes will be reflected immediately. If you 
 2. Copy the updated files to the mods directory
 3. Restart Project Zomboid
 
-### Finding Logs (Mac)
+### Finding Logs
 
+**Windows:**
+Project Zomboid logs are located at:
+```
+C:\Users\[YourUsername]\Zomboid\logs\
+```
+
+To view logs:
+- Open the folder in File Explorer
+- Look for files like `console.txt` and `LuaDebug.txt`
+- Open them with Notepad or any text editor
+
+**Mac:**
 Project Zomboid logs are located at:
 ```
 ~/Zomboid/logs/
@@ -83,13 +143,21 @@ tail -f ~/Zomboid/logs/*.txt
 
 ### Editing Lua Files
 
-You can use any text editor. Recommended editors for Mac:
-- **Visual Studio Code** (with Lua extension)
-- **Sublime Text**
-- **TextMate**
-- **Xcode** (comes with Mac)
+You can use any text editor. Recommended editors:
+- **Visual Studio Code** (with Lua extension) - Works on both Windows and Mac
+- **Sublime Text** - Works on both platforms
+- **Notepad++** - Windows only
+- **TextMate** - Mac only
 
-## Mac-Specific Notes
+## Platform-Specific Notes
+
+### Windows
+
+1. **File Paths**: Windows uses backslashes (`\`) in paths, but the mod structure should work the same
+2. **Case Sensitivity**: Windows file system is case-insensitive, but mod.info references are case-sensitive
+3. **Permissions**: Usually not an issue on Windows, but ensure the mod folder isn't read-only
+
+### Mac
 
 1. **Build 42.13 Status**: As of this writing, Build 42 is unstable on Mac. Make sure you're testing with the correct build version.
 
@@ -108,7 +176,8 @@ You can use any text editor. Recommended editors for Mac:
 - Check the game's console for error messages
 
 ### Mod Not Loading
-- Check `~/Zomboid/logs/` for Lua errors
+- **Windows**: Check `C:\Users\[YourUsername]\Zomboid\logs\` for Lua errors
+- **Mac**: Check `~/Zomboid/logs/` for Lua errors
 - Ensure all Lua files have proper syntax
 - Verify Build 42.13 compatibility
 
