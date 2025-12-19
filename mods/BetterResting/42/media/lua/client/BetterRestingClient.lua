@@ -465,7 +465,7 @@ Events.OnPlayerUpdate.Add(function(player)
         local messages = {
             [BetterResting.RestType.CHAIR] = "Resting on furniture - Enhanced stamina recovery",
             [BetterResting.RestType.VEHICLE] = "Resting in vehicle - Maximum stamina recovery",
-            [BetterResting.RestType.BED] = "Resting in bed - Health and muscle recovery",
+            [BetterResting.RestType.BED] = "Resting in bed - Wounds and muscle strain recovery",
         }
         
         if messages[restType] then

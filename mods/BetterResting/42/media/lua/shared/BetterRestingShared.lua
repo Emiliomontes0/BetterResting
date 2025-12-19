@@ -8,7 +8,7 @@ BetterResting.ModID = "BetterResting"
 -- Configuration values
 BetterResting.Config = {
     -- Chair/Sofa bonuses
-    ChairStaminaRegenMultiplier = 1.5,        -- 50% faster stamina regen on chairs
+    ChairStaminaRegenMultiplier = 1.07,       -- 7% faster stamina regen on chairs
     ChairBuffDuration = 600,                  -- 10 minutes = 600 seconds (game time)
     ChairStaminaConsumptionReduction = 0.75,  -- 25% reduction when buff active
     MinChairRestTime = 0.1,
@@ -16,11 +16,11 @@ BetterResting.Config = {
     MaxBuffDuration = 1.0,
     
     -- Vehicle bonuses
-    VehicleStaminaRegenMultiplier = 2.0,      -- 2x faster stamina regen in vehicle
+    VehicleStaminaRegenMultiplier = 1.10,     -- 10% faster stamina regen in vehicle
     VehicleStaminaConsumptionReduction = 0.5, -- 50% reduction while in vehicle
     
     -- Bed bonuses
-    BedStaminaRegenMultiplier = 3.0,          -- 3x faster stamina regen in bed
+    BedStaminaRegenMultiplier = 1.2,          -- 20% faster stamina regen in bed
     BedHPRegenMultiplier = 2.0,               -- 2x faster HP regen (gradual healing)
     BedMuscleFatigueReduction = 0.15,         -- 15% faster muscle fatigue recovery
 
@@ -59,25 +59,35 @@ function BetterResting.detectRestType(player)
     if not square then return BetterResting.RestType.FLOOR end
     
     local objects = square:getObjects()
+    if not objects then return BetterResting.RestType.FLOOR end
+    
     for i = 0, objects:size() - 1 do
         local obj = objects:get(i)
         if obj then
-            local spriteName = obj:getSprite():getName():lower()
-            
-            -- Check for beds
-            if spriteName:find("bed") or 
-               spriteName:find("furniture_bed") or
-               spriteName:find("furniture_sleeping") then
-                return BetterResting.RestType.BED
-            end
-            
-            -- Check for chairs/sofas/couches
-            if spriteName:find("chair") or 
-               spriteName:find("sofa") or 
-               spriteName:find("couch") or
-               spriteName:find("seat") or
-               spriteName:find("furniture_seating") then
-                return BetterResting.RestType.CHAIR
+            -- Safely get sprite name with nil checks
+            local sprite = obj:getSprite()
+            if sprite then
+                local spriteNameObj = sprite:getName()
+                if spriteNameObj then
+                    local spriteName = spriteNameObj:lower()
+                    if spriteName then
+                        -- Check for beds
+                        if spriteName:find("bed") or 
+                           spriteName:find("furniture_bed") or
+                           spriteName:find("furniture_sleeping") then
+                            return BetterResting.RestType.BED
+                        end
+                        
+                        -- Check for chairs/sofas/couches
+                        if spriteName:find("chair") or 
+                           spriteName:find("sofa") or 
+                           spriteName:find("couch") or
+                           spriteName:find("seat") or
+                           spriteName:find("furniture_seating") then
+                            return BetterResting.RestType.CHAIR
+                        end
+                    end
+                end
             end
         end
     end
