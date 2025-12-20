@@ -1,3 +1,7 @@
 name=BetterResting
 id=BetterResting
 description=BetterResting improves resting on furniture,vehicle, and beds
+poster=poster.png
+versionMin=42.00
+modversion=1.0
+author=Wabisque

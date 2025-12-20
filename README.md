@@ -1,65 +1,67 @@
 # BetterResting - Project Zomboid Mod
 
-A mod for Project Zomboid Build 42.13 that improves resting and sleeping mechanics.
+A mod for Project Zomboid Build 42 that enhances resting mechanics, providing better stamina recovery and health benefits when resting on furniture, in vehicles, or in beds.
 
-## Installation (Mac)
+## Features
 
-### For Local Development:
-1. Navigate to your Project Zomboid mods directory:
-   ```
-   ~/Zomboid/mods/
-   ```
+- **Enhanced Chair/Sofa Resting**: Faster stamina recovery when resting on chairs, sofas, and other seating furniture
+- **Well Rested Buff**: After resting on furniture long enough to fully recover stamina, gain a temporary buff that reduces stamina consumption
+- **Vehicle Resting**: Improved stamina recovery while resting in vehicles
+- **Bed Resting**: Enhanced healing for wounds, muscle strain, and health when resting in beds
+- **Smart Detection**: Automatically detects when you're actually resting (not just walking through furniture)
 
-2. If the `mods` directory doesn't exist, create it:
-   ```bash
-   mkdir -p ~/Zomboid/mods
-   ```
+## Installation
 
-3. Copy this entire `BetterResting` folder to the mods directory:
-   ```bash
-   cp -r BetterResting ~/Zomboid/mods/
-   ```
-
-4. Your mod structure should look like:
-   ```
-   ~/Zomboid/mods/BetterResting/
-   ├── mod.info
-   ├── lua/
-   ├── media/
-   └── README.md
-   ```
-
-### For Steam Workshop:
+### Steam Workshop (Recommended)
 1. Subscribe to the mod through Steam Workshop
 2. The mod will be automatically installed
+3. Enable it in-game: **Options** → **Mods** → Check **BetterResting**
 
-## Enabling the Mod
+### Manual Installation
+1. Download the mod files
+2. Extract to your Project Zomboid mods directory:
+   - **Windows**: `C:\Users\[YourUsername]\Zomboid\mods\`
+   - **Mac**: `~/Zomboid/mods/`
+   - **Linux**: `~/.local/share/Steam/steamapps/common/ProjectZomboid/mods/`
+3. Enable it in-game: **Options** → **Mods** → Check **BetterResting**
 
-1. Launch Project Zomboid
-2. Go to **Options** → **Mods**
-3. Check the box next to **Better Resting**
-4. Restart the game if required
+## How It Works
 
-## Structure
+### Chair/Sofa Resting
+- Rest on any chair, sofa, stool, bench, or seating furniture
+- Stamina recovers 7% faster than normal
+- After resting long enough to fully recover stamina, gain a "Well Rested" buff
+- The buff reduces stamina consumption by 25% for a duration based on how long you rested
 
-- `mod.info` - Mod metadata and configuration
-- `lua/` - Lua scripts for mod functionality
-- `media/` - Textures, sounds, and other media files
-- `README.md` - This file
+### Vehicle Resting
+- Rest in any vehicle seat
+- Stamina recovers 10% faster than normal
+- Perfect for quick recovery during long drives
 
-## Development Notes
+### Bed Resting
+- Rest in any bed, sleeping bag, cot, or tent
+- Stamina recovers 20% faster than normal
+- Wounds heal gradually over time
+- Muscle strain (stiffness) recovers 30% faster
+- Health gradually restores when resting
 
-- Build 42.13 is an unstable build, so be prepared for compatibility issues
-- Test thoroughly before releasing
-- Make sure all Lua scripts are compatible with Build 42.13 API
+## Requirements
 
-## Resources
+- Project Zomboid Build 42 or later
+- No other mods required
 
-- [Zomboid Modding Guide](https://github.com/FWolfe/Zomboid-Modding-Guide)
-- [PZ Modding Community](https://pzwiki.net/wiki/PZ_Modding_Community)
-- [Project Zomboid Modding Policy](https://projectzomboid.com/blog/modding-policy/)
+## Compatibility
+
+This mod is designed for Build 42. It may not work correctly with earlier builds.
+
+## Credits
+
+Created for Project Zomboid Build 42.
 
 ## License
 
 [Add your license here]
 
+## Support
+
+If you encounter any issues or have suggestions, please report them on the Steam Workshop page or the mod's GitHub repository.

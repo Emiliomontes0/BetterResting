@@ -40,20 +40,16 @@ local confirmationTimer = 0
 
 -- Show buff messages
 local function showBuffMessage(buffType, duration, buffEndTime)
-    print("BetterResting [CLIENT] showBuffMessage called - buffType: " .. tostring(buffType) .. ", duration: " .. tostring(duration))
     if buffType == "chair" then
         local player = getPlayer()
-        print("BetterResting [CLIENT] Player found: " .. tostring(player ~= nil))
         if player then
             local durationText = ""
             if duration then
                 durationText = " (" .. duration .. " minutes)"
             end
             local message = "Well Rested! Reduced stamina consumption" .. durationText
-            print("BetterResting [CLIENT] Showing message: " .. message)
             -- Show green text above player (using RGB: 0, 255, 0 for green)
             HaloTextHelper.addTextWithArrow(player, message, true, 0, 255, 0)
-            print("BetterResting [CLIENT] HaloTextHelper.addText called")
             -- Mark buff as active
             clientBuffData.chairBuffActive = true
             clientBuffData.lastIndicatorTime = 0 -- Reset timer so indicator shows immediately
@@ -62,9 +58,6 @@ local function showBuffMessage(buffType, duration, buffEndTime)
             if buffEndTime and BetterResting.ClientBuffData then
                 BetterResting.ClientBuffData.chairBuffEndTime = buffEndTime
             end
-            print("BetterResting [CLIENT] Buff activated - Active: " .. tostring(clientBuffData.chairBuffActive))
-        else
-            print("BetterResting [CLIENT] ERROR: getPlayer() returned nil!")
         end
     end
 end
@@ -84,6 +77,14 @@ end
 
 -- Show rest location feedback (optional)
 local lastRestType = nil
+-- Track message display for extended duration
+local restMessageData = {
+    startTick = 0,
+    message = nil,
+    duration = 600, -- Display for 10 seconds (600 ticks at 60 ticks/sec)
+    refreshInterval = 60, -- Refresh every 1 second (60 ticks)
+    lastRefresh = 0
+}
 
 -- Apply chair buff when stamina is full
 local function applyChairBuff(player, data)
@@ -121,10 +122,6 @@ local function applyChairBuff(player, data)
             -- Show buff message
             local buffMinutes = math.floor(BuffDurationHours * 60)
             showBuffMessage("chair", buffMinutes, data.chairBuffEndTime)
-            
-            -- Debug output
-            print("BetterResting [BUFF] Well Rested buff activated! Duration: " .. buffMinutes .. " minutes")
-            print("BetterResting [BUFF] Buff will expire at game hour: " .. data.chairBuffEndTime)
 
             data.chairRestStartTime = 0
         end
@@ -152,13 +149,6 @@ local function processChairResting(player, data, updateCounter)
         
         -- Build 42 API: Use stats:set(CharacterStat.ENDURANCE, value)
         stats:set(CharacterStat.ENDURANCE, newStamina)
-        
-        -- Debug output every 2 seconds
-        if updateCounter and updateCounter % 120 == 0 then
-            local staminaPercent = math.floor(stamina * 100)
-            local newPercent = math.floor(newStamina * 100)
-            print("BetterResting [CHAIR] Stamina: " .. staminaPercent .. "% -> " .. newPercent .. "% (Regen: " .. string.format("%.4f", bonusRegen) .. ")")
-        end
     end
     
     -- Check and apply buff when stamina is full
@@ -182,13 +172,6 @@ local function processVehicleResting(player, data, updateCounter)
         
         -- Build 42 API: Use stats:set(CharacterStat.ENDURANCE, value)
         stats:set(CharacterStat.ENDURANCE, newStamina)
-        
-        -- Debug: Show stamina regen every 2 seconds
-        if updateCounter and updateCounter % 120 == 0 then
-            local staminaPercent = math.floor(stamina * 100)
-            local newPercent = math.floor(newStamina * 100)
-            print("BetterResting [VEHICLE] Stamina: " .. staminaPercent .. "% -> " .. newPercent .. "% (Regen: " .. string.format("%.4f", bonusRegen) .. ")")
-        end
     end
 end
 
@@ -212,13 +195,6 @@ local function processBedResting(player, data, updateCounter)
             
             -- Build 42 API: Use stats:set(CharacterStat.ENDURANCE, value)
             stats:set(CharacterStat.ENDURANCE, newStamina)
-            
-            -- Debug: Show stamina regen every 2 seconds
-            if updateCounter and updateCounter % 120 == 0 then
-                local staminaPercent = math.floor(stamina * 100)
-                local newPercent = math.floor(newStamina * 100)
-                print("BetterResting [BED] Stamina: " .. staminaPercent .. "% -> " .. newPercent .. "% (Regen: " .. string.format("%.4f", bonusRegen) .. ")")
-            end
         end
     end
     
@@ -231,18 +207,6 @@ local function processBedResting(player, data, updateCounter)
         -- Based on ISHealthPanel.lua line 282-285: iterate through body parts
         local bodyParts = bodyDamage:getBodyParts()
         if bodyParts then
-            -- Debug: Check first body part for available methods
-            if updateCounter and updateCounter % 120 == 0 then
-                local samplePart = bodyParts:get(0)
-                if samplePart then
-                    print("BetterResting [BED] Sample part health: " .. tostring(samplePart:getHealth()))
-                    print("BetterResting [BED] Has setHealth: " .. tostring(samplePart.setHealth ~= nil))
-                    print("BetterResting [BED] Has RestoreToFullHealth: " .. tostring(samplePart.RestoreToFullHealth ~= nil))
-                else
-                    print("BetterResting [BED] ERROR: Could not get sample body part")
-                end
-                print("BetterResting [BED] Body parts count: " .. tostring(bodyParts:size()))
-            end
             
             -- Gradual healing: reduce wound times incrementally (based on ISHealthPanel.lua)
             -- This allows true tick-by-tick healing without instantly removing wounds
@@ -353,28 +317,13 @@ local function processBedResting(player, data, updateCounter)
                                 part:RestoreToFullHealth()
                                 bodyPartHealCooldowns[partKey] = updateCounter
                                 healedAny = true
-                                
-                                if updateCounter % 120 == 0 then
-                                    print("BetterResting [BED] Gradually restored health for part " .. i .. " (was: " .. string.format("%.2f", partHealth) .. "%)")
-                                end
                             end
                         elseif partHealed then
                             healedAny = true
-                            if updateCounter % 120 == 0 then
-                                print("BetterResting [BED] Gradually healing wounds on part " .. i .. " (health: " .. string.format("%.2f", partHealth) .. "%)")
-                            end
                         end
                     end
                 end
             end
-        else
-            if updateCounter and updateCounter % 120 == 0 then
-                print("BetterResting [BED] ERROR: getBodyParts() returned nil")
-            end
-        end
-        
-        if not healedAny and updateCounter and updateCounter % 120 == 0 then
-            print("BetterResting [BED] No healing applied - all parts may be at full health or methods not available")
         end
     end
     
@@ -392,11 +341,6 @@ local function processBedResting(player, data, updateCounter)
                         local reduction = pain * BetterResting.Config.BedMuscleFatigueReduction * 0.01
                         local newPain = math.max(0, pain - reduction)
                         part:setPain(newPain)
-                        
-                        -- Debug output every 2 seconds
-                        if updateCounter and updateCounter % 120 == 0 then
-                            print("BetterResting [BED] Reducing pain - Pain: " .. string.format("%.4f", pain) .. " -> " .. string.format("%.4f", newPain) .. " (Reduction: " .. string.format("%.4f", reduction) .. ")")
-                        end
                     end
                 end
             end
@@ -461,7 +405,6 @@ Events.OnPlayerUpdate.Add(function(player)
     
     -- UI: Show message when rest type changes (first time only)
     if restType ~= lastRestType and restType ~= BetterResting.RestType.FLOOR then
-        print("BetterResting [CLIENT] Rest type changed to: " .. tostring(restType))
         local messages = {
             [BetterResting.RestType.CHAIR] = "Resting on furniture - Enhanced stamina recovery",
             [BetterResting.RestType.VEHICLE] = "Resting in vehicle - Maximum stamina recovery",
@@ -469,30 +412,34 @@ Events.OnPlayerUpdate.Add(function(player)
         }
         
         if messages[restType] then
-            print("BetterResting [CLIENT] Showing rest message: " .. messages[restType])
+            -- Start extended message display
+            restMessageData.startTick = updateCounter
+            restMessageData.message = messages[restType]
+            restMessageData.lastRefresh = updateCounter
             HaloTextHelper.addTextWithArrow(player, messages[restType], true, 0, 100, 255)
         end
     end
     
-    -- Show periodic stamina status while resting (every 10 seconds)
-    if restType ~= BetterResting.RestType.FLOOR then
-        if updateCounter - lastStaminaCheck >= 600 then -- Every ~10 seconds
-            local stats = player:getStats()
-            if stats then
-                local stamina = nil
-                if stats.getEndurance then
-                    stamina = stats:getEndurance()
-                elseif stats.getFatigue then
-                    stamina = stats:getFatigue()
-                end
-                if stamina then
-                    local staminaPercent = math.floor(stamina * 100)
-                    print("BetterResting [STATUS] Resting on " .. tostring(restType) .. " - Stamina: " .. staminaPercent .. "%")
-                    lastStaminaCheck = updateCounter
-                end
+    -- Refresh message periodically for extended display duration
+    if restMessageData.message and restType ~= BetterResting.RestType.FLOOR then
+        local elapsed = updateCounter - restMessageData.startTick
+        if elapsed < restMessageData.duration then
+            -- Refresh message at intervals to keep it visible
+            if updateCounter - restMessageData.lastRefresh >= restMessageData.refreshInterval then
+                HaloTextHelper.addTextWithArrow(player, restMessageData.message, true, 0, 100, 255)
+                restMessageData.lastRefresh = updateCounter
             end
+        else
+            -- Duration expired, clear message
+            restMessageData.message = nil
         end
-    else
+    elseif restType == BetterResting.RestType.FLOOR then
+        -- Clear message when no longer resting
+        restMessageData.message = nil
+    end
+    
+    -- Reset stamina check timer
+    if restType == BetterResting.RestType.FLOOR then
         lastStaminaCheck = updateCounter
     end
     
@@ -503,34 +450,28 @@ Events.OnPlayerUpdate.Add(function(player)
     
     -- Check shared global data (works in single player where server sets this)
     if BetterResting.ClientBuffData then
-        if BetterResting.ClientBuffData.chairBuffActive then
-            local currentGameHours = BetterResting.getCurrentGameHours()
-            if updateCounter % 300 == 0 then
-                print("BetterResting [CLIENT] Checking buff - Current hours: " .. currentGameHours .. ", End time: " .. BetterResting.ClientBuffData.chairBuffEndTime)
-            end
-            if currentGameHours < BetterResting.ClientBuffData.chairBuffEndTime then
-                buffShouldBeActive = true
-                -- Sync client data
-                if not clientBuffData.chairBuffActive then
-                    print("BetterResting [CLIENT] Syncing buff state - activating client buff")
-                    clientBuffData.chairBuffActive = true
-                    clientBuffData.lastIndicatorTime = 0
+            if BetterResting.ClientBuffData.chairBuffActive then
+                local currentGameHours = BetterResting.getCurrentGameHours()
+                if currentGameHours < BetterResting.ClientBuffData.chairBuffEndTime then
+                    buffShouldBeActive = true
+                    -- Sync client data
+                    if not clientBuffData.chairBuffActive then
+                        clientBuffData.chairBuffActive = true
+                        clientBuffData.lastIndicatorTime = 0
+                    end
+                else
+                    -- Buff expired
+                    if clientBuffData.chairBuffActive then
+                        showBuffExpired("chair")
+                    end
+                    BetterResting.ClientBuffData.chairBuffActive = false
                 end
             else
-                -- Buff expired
+                -- Buff not active in shared data
                 if clientBuffData.chairBuffActive then
-                    print("BetterResting [CLIENT] Buff expired!")
-                    showBuffExpired("chair")
+                    clientBuffData.chairBuffActive = false
                 end
-                BetterResting.ClientBuffData.chairBuffActive = false
             end
-        else
-            -- Buff not active in shared data
-            if clientBuffData.chairBuffActive then
-                print("BetterResting [CLIENT] Buff deactivated in shared data")
-                clientBuffData.chairBuffActive = false
-            end
-        end
     end
     
     -- Show periodic indicator while buff is active
@@ -540,7 +481,6 @@ Events.OnPlayerUpdate.Add(function(player)
         
         -- Show indicator every 30 seconds
         if timeSinceLastIndicator >= clientBuffData.indicatorInterval then
-            print("BetterResting [CLIENT] Showing periodic indicator - 'I feel well rested'")
             HaloTextHelper.addTextWithArrow(player, "I feel well rested", true, 0, 255, 0)
             clientBuffData.lastIndicatorTime = currentTime
         end
@@ -558,7 +498,6 @@ local function showModConfirmation()
     if player and not hasShownInitialMessage then
         -- Show a clear confirmation message (green: 0, 255, 0)
         HaloTextHelper.addTextWithArrow(player, "BetterResting Mod Loaded!", true, 0, 255, 0)
-        print("BetterResting [CLIENT] Mod confirmation message displayed!")
         hasShownInitialMessage = true
     end
 end
@@ -571,7 +510,6 @@ local function initBetterResting()
     -- Show confirmation message
     if not hasShownInitialMessage then
         HaloTextHelper.addTextWithArrow(player, "BetterResting Mod Loaded!", true, 0, 255, 0)
-        print("BetterResting [CLIENT] Mod loaded and initialized!")
         hasShownInitialMessage = true
     end
 end
