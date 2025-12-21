@@ -1,31 +1,14 @@
 -- BetterResting Client-side Script
--- Handles UI feedback, messages, and game mechanics
--- (In single-player, client = server, so we handle everything here)
+-- Handles UI feedback and messages only
+-- Game mechanics are handled by server script (BetterRestingServer.lua)
 
 -- Shared script should auto-load, but require as fallback
 if not BetterResting then
     require "BetterRestingShared"
 end
 
--- Track player states (game mechanics)
-local playerRestData = {}
-
--- Initialize player data tracking
-local function initPlayerData(player)
-    local playerNum = player:getPlayerNum()
-    if not playerRestData[playerNum] then
-        playerRestData[playerNum] = {
-            currentRestType = nil,
-            chairBuffActive = false,
-            chairBuffEndTime = 0,
-            lastStaminaLevel = 1.0,
-            wasFullStamina = false,
-            chairRestStartTime = 0,
-            lastRestType = nil,
-        }
-    end
-    return playerRestData[playerNum]
-end
+-- Track last rest type for UI messages only
+local lastRestType = nil
 
 -- Track buff states on client (for UI)
 local clientBuffData = {
@@ -38,7 +21,7 @@ local clientBuffData = {
 local hasShownInitialMessage = false
 local confirmationTimer = 0
 
--- Show buff messages
+-- Show buff messages (triggered when server sets buff)
 local function showBuffMessage(buffType, duration, buffEndTime)
     if buffType == "chair" then
         local player = getPlayer()
@@ -53,11 +36,6 @@ local function showBuffMessage(buffType, duration, buffEndTime)
             -- Mark buff as active
             clientBuffData.chairBuffActive = true
             clientBuffData.lastIndicatorTime = 0 -- Reset timer so indicator shows immediately
-            
-            -- Store end time in shared data (already done by server, but update local if provided)
-            if buffEndTime and BetterResting.ClientBuffData then
-                BetterResting.ClientBuffData.chairBuffEndTime = buffEndTime
-            end
         end
     end
 end
@@ -73,10 +51,7 @@ local function showBuffExpired(buffType)
     end
 end
 
--- Note: Removed OnClientCommand handler since we're running everything on client now
-
 -- Show rest location feedback (optional)
-local lastRestType = nil
 -- Track message display for extended duration
 local restMessageData = {
     startTick = 0,
@@ -86,271 +61,10 @@ local restMessageData = {
     lastRefresh = 0
 }
 
--- Apply chair buff when stamina is full
-local function applyChairBuff(player, data)
-    local stats = player:getStats()
-    if not stats then return end
-    
-    -- Build 42 API: Use stats:get(CharacterStat.ENDURANCE)
-    local stamina = stats:get(CharacterStat.ENDURANCE)
-    if not stamina then return end
-    
-    -- Check if stamina just reached full
-    if stamina >= 0.99 and not data.wasFullStamina then
-        local currentGameHours = BetterResting.getCurrentGameHours()
-        local restDurationHours = currentGameHours - data.chairRestStartTime
+-- Game mechanics removed - handled by server script
 
-        if restDurationHours >= BetterResting.Config.MinChairRestTime then
-            local BuffDurationHours = math.min(
-                BetterResting.Config.MaxBuffDuration,
-                math.max(
-                    BetterResting.Config.MinBuffDuration,
-                    restDurationHours
-                )
-            )
-
-            data.chairBuffActive = true
-            data.chairBuffEndTime = currentGameHours + BuffDurationHours
-            
-            -- Store buff end time in shared global for client access
-            if not BetterResting.ClientBuffData then
-                BetterResting.ClientBuffData = {}
-            end
-            BetterResting.ClientBuffData.chairBuffEndTime = data.chairBuffEndTime
-            BetterResting.ClientBuffData.chairBuffActive = true
-            
-            -- Show buff message
-            local buffMinutes = math.floor(BuffDurationHours * 60)
-            showBuffMessage("chair", buffMinutes, data.chairBuffEndTime)
-
-            data.chairRestStartTime = 0
-        end
-        data.wasFullStamina = true
-    end
-    if stamina < 0.99 then 
-        data.wasFullStamina = false
-    end 
-end
-
--- Process chair/sofa resting bonuses
-local function processChairResting(player, data, updateCounter)
-    local stats = player:getStats()
-    if not stats then return end
-    
-    -- Build 42 API: Use stats:get(CharacterStat.ENDURANCE)
-    local stamina = stats:get(CharacterStat.ENDURANCE)
-    if not stamina then return end
-    
-    -- Enhanced stamina regen while resting on chair
-    if stamina < 1.0 then
-        local baseRegen = 0.001 -- Base stamina regen per tick
-        local bonusRegen = baseRegen * (BetterResting.Config.ChairStaminaRegenMultiplier - 1.0)
-        local newStamina = math.min(1.0, stamina + bonusRegen)
-        
-        -- Build 42 API: Use stats:set(CharacterStat.ENDURANCE, value)
-        stats:set(CharacterStat.ENDURANCE, newStamina)
-    end
-    
-    -- Check and apply buff when stamina is full
-    applyChairBuff(player, data)
-end
-
--- Process vehicle resting bonuses
-local function processVehicleResting(player, data, updateCounter)
-    local stats = player:getStats()
-    if not stats then return end
-    
-    -- Build 42 API: Use stats:get(CharacterStat.ENDURANCE)
-    local stamina = stats:get(CharacterStat.ENDURANCE)
-    if not stamina then return end
-    
-    -- Enhanced stamina regen while in vehicle
-    if stamina < 1.0 then
-        local baseRegen = 0.001 -- Base stamina regen per tick
-        local bonusRegen = baseRegen * (BetterResting.Config.VehicleStaminaRegenMultiplier - 1.0)
-        local newStamina = math.min(1.0, stamina + bonusRegen)
-        
-        -- Build 42 API: Use stats:set(CharacterStat.ENDURANCE, value)
-        stats:set(CharacterStat.ENDURANCE, newStamina)
-    end
-end
-
--- Track last heal time for each body part (for gradual healing)
-local bodyPartHealCooldowns = {}
-
--- Process bed resting bonuses
-local function processBedResting(player, data, updateCounter)
-    local bodyDamage = player:getBodyDamage()
-    if not bodyDamage then return end
-    
-    -- Enhanced stamina regen while in bed (TESTING - VERY HIGH)
-    local stats = player:getStats()
-    if stats then
-        -- Build 42 API: Use stats:get(CharacterStat.ENDURANCE)
-        local stamina = stats:get(CharacterStat.ENDURANCE)
-        if stamina and stamina < 1.0 then
-            local baseRegen = 0.001 -- Base stamina regen per tick
-            local bonusRegen = baseRegen * (BetterResting.Config.BedStaminaRegenMultiplier - 1.0)
-            local newStamina = math.min(1.0, stamina + bonusRegen)
-            
-            -- Build 42 API: Use stats:set(CharacterStat.ENDURANCE, value)
-            stats:set(CharacterStat.ENDURANCE, newStamina)
-        end
-    end
-    
-    -- Enhanced HP regen
-    -- Build 42 API: Based on ISHealthPanel.lua lines 273-285 and 577
-    -- Found: bodyPart:RestoreToFullHealth() and bodyPart:getHealth()
-    local health = bodyDamage:getHealth() / 100.0  -- Returns 0-100, convert to 0-1
-    if health and health < 1.0 then
-        local healedAny = false
-        -- Based on ISHealthPanel.lua line 282-285: iterate through body parts
-        local bodyParts = bodyDamage:getBodyParts()
-        if bodyParts then
-            
-            -- Gradual healing: reduce wound times incrementally (based on ISHealthPanel.lua)
-            -- This allows true tick-by-tick healing without instantly removing wounds
-            -- Use cooldown to prevent healing every single tick (heal every 6 ticks = ~0.1 seconds)
-            local woundHealCooldown = 6  -- Heal wounds every 6 ticks instead of every tick
-            
-            for i = 1, bodyParts:size() do
-                local part = bodyParts:get(i - 1)
-                if part then
-                    -- Get current health of body part (returns 0-100)
-                    local partHealth = part:getHealth()
-                    if partHealth and partHealth < 100.0 then
-                        local partKey = tostring(i)
-                        local lastWoundHeal = bodyPartHealCooldowns[partKey .. "_wound"] or 0
-                        local partHealed = false
-                        
-                        -- Only heal wounds every N ticks to slow down healing
-                        if updateCounter - lastWoundHeal >= woundHealCooldown then
-                            -- Gradually reduce wound times (methods from ISHealthPanel.lua)
-                            -- Very slow rates for gradual healing over time
-                            -- Reduce scratch time
-                            if part.getScratchTime and part.setScratchTime and part.setScratched then
-                                local scratchTime = part:getScratchTime()
-                                if scratchTime and scratchTime > 0 then
-                                    local reduction = 0.001 * BetterResting.Config.BedHPRegenMultiplier  -- Very slow reduction
-                                    local newTime = math.max(0, scratchTime - reduction)
-                                    if newTime <= 0 then
-                                        part:setScratched(false, true)
-                                    else
-                                        part:setScratchTime(newTime)
-                                    end
-                                    partHealed = true
-                                end
-                            end
-                            
-                            -- Reduce cut time
-                            if part.getCutTime and part.setCutTime and part.setCut then
-                                local cutTime = part:getCutTime()
-                                if cutTime and cutTime > 0 then
-                                    local reduction = 0.001 * BetterResting.Config.BedHPRegenMultiplier  -- Very slow reduction
-                                    local newTime = math.max(0, cutTime - reduction)
-                                    if newTime <= 0 then
-                                        part:setCut(false)
-                                    else
-                                        part:setCutTime(newTime)
-                                    end
-                                    partHealed = true
-                                end
-                            end
-                            
-                            -- Reduce deep wound time
-                            if part.getDeepWoundTime and part.setDeepWoundTime and part.setDeepWounded then
-                                local deepWoundTime = part:getDeepWoundTime()
-                                if deepWoundTime and deepWoundTime > 0 then
-                                    local reduction = 0.001 * BetterResting.Config.BedHPRegenMultiplier  -- Very slow reduction
-                                    local newTime = math.max(0, deepWoundTime - reduction)
-                                    part:setDeepWoundTime(newTime)
-                                    if newTime <= 0 then
-                                        part:setDeepWounded(false)
-                                    end
-                                    partHealed = true
-                                end
-                            end
-                            
-                            -- Reduce bleeding time
-                            if part.getBleedingTime and part.setBleedingTime then
-                                local bleedingTime = part:getBleedingTime()
-                                if bleedingTime and bleedingTime > 0 then
-                                    local reduction = 0.001 * BetterResting.Config.BedHPRegenMultiplier  -- Very slow reduction
-                                    local newTime = math.max(0, bleedingTime - reduction)
-                                    part:setBleedingTime(newTime)
-                                    partHealed = true
-                                end
-                            end
-                            
-                            -- Reduce muscle strain (stiffness) - based on ISHealthPanel.lua lines 276-278
-                            if part.getStiffness and part.setStiffness then
-                                local stiffness = part:getStiffness()
-                                if stiffness and stiffness > 0 then
-                                    local reduction = 0.005 * BetterResting.Config.BedMuscleFatigueReduction * 100  -- Very slow reduction for stiffness
-                                    local newStiffness = math.max(0, stiffness - reduction)
-                                    part:setStiffness(newStiffness)
-                                    
-                                    -- If stiffness reaches 0, remove it from fitness system (as per ISHealthPanel.lua)
-                                    if newStiffness <= 0 and player.getFitness then
-                                        local fitness = player:getFitness()
-                                        if fitness and fitness.removeStiffnessValue then
-                                            fitness:removeStiffnessValue(BodyPartType.ToString(part:getType()))
-                                        end
-                                    end
-                                    
-                                    partHealed = true
-                                end
-                            end
-                            
-                            if partHealed then
-                                bodyPartHealCooldowns[partKey .. "_wound"] = updateCounter
-                            end
-                        end
-                        
-                        -- Gradually restore health (only when health is low and wounds are mostly healed)
-                        -- Use RestoreToFullHealth but with much longer cooldown to prevent instant full heal
-                        if part.RestoreToFullHealth and partHealth < 70.0 then
-                            local lastHeal = bodyPartHealCooldowns[partKey] or 0
-                            local healCooldown = math.max(1, math.floor(600 / BetterResting.Config.BedHPRegenMultiplier))  -- Much longer cooldown (10 seconds)
-                            
-                            if updateCounter - lastHeal >= healCooldown then
-                                part:RestoreToFullHealth()
-                                bodyPartHealCooldowns[partKey] = updateCounter
-                                healedAny = true
-                            end
-                        elseif partHealed then
-                            healedAny = true
-                        end
-                    end
-                end
-            end
-        end
-    end
-    
-    -- Reduce muscle fatigue faster
-    local parts = bodyDamage:getBodyParts()
-    if parts then
-        for i = 0, parts:size() - 1 do
-            local part = parts:get(i)
-            if part then
-                -- Check if getPain method exists
-                if part.getPain and part.setPain then
-                    local pain = part:getPain()
-                    if pain and pain > 0 then
-                        -- Reduce pain faster
-                        local reduction = pain * BetterResting.Config.BedMuscleFatigueReduction * 0.01
-                        local newPain = math.max(0, pain - reduction)
-                        part:setPain(newPain)
-                    end
-                end
-            end
-        end
-    end
-end
-
--- Main update loop - handles game mechanics AND UI
+-- Main update loop - handles UI only (game mechanics on server)
 local updateCounter = 0
-local lastStaminaCheck = 0
 Events.OnPlayerUpdate.Add(function(player)
     if not player then return end
     
@@ -364,43 +78,30 @@ Events.OnPlayerUpdate.Add(function(player)
         end
     end
     
-    -- Initialize player data
-    local data = initPlayerData(player)
+    -- Detect rest type for UI messages only
     local restType = BetterResting.detectRestType(player)
-
-    -- Track rest type changes
-    if data.lastRestType ~= restType then
-        if restType == BetterResting.RestType.CHAIR then 
-            data.chairRestStartTime = BetterResting.getCurrentGameHours()
-        elseif data.lastRestType == BetterResting.RestType.CHAIR then 
-            data.chairRestStartTime = 0
-            data.wasFullStamina = false
+    
+    -- Check for buff activation (server sets this in BetterResting.ClientBuffData)
+    if BetterResting.ClientBuffData and BetterResting.ClientBuffData.chairBuffActive then
+        local currentGameHours = BetterResting.getCurrentGameHours()
+        local endTime = BetterResting.ClientBuffData.chairBuffEndTime
+        
+        -- Check if buff just activated (wasn't active before)
+        if not clientBuffData.chairBuffActive and endTime > currentGameHours then
+            local remaining = endTime - currentGameHours
+            local remainingMinutes = math.floor(remaining * 60)
+            showBuffMessage("chair", remainingMinutes, endTime)
         end
-    end
-    
-    data.lastRestType = restType
-    data.currentRestType = restType
-    
-    -- Process bonuses based on rest type (GAME MECHANICS)
-    if restType == BetterResting.RestType.CHAIR then
-        processChairResting(player, data, updateCounter)
-    elseif restType == BetterResting.RestType.VEHICLE then
-        processVehicleResting(player, data, updateCounter)
-    elseif restType == BetterResting.RestType.BED then
-        processBedResting(player, data, updateCounter)
-    end
-    
-    -- Clean up buffs when expired
-    if data.chairBuffActive then
-        local currentHours = BetterResting.getCurrentGameHours()
-        if currentHours >= data.chairBuffEndTime then
-            data.chairBuffActive = false
-            if BetterResting.ClientBuffData then
-                BetterResting.ClientBuffData.chairBuffActive = false
-                BetterResting.ClientBuffData.chairBuffEndTime = 0
-            end
+        
+        -- Check if buff expired
+        if clientBuffData.chairBuffActive and currentGameHours >= endTime then
             showBuffExpired("chair")
         end
+        
+        clientBuffData.chairBuffActive = BetterResting.ClientBuffData.chairBuffActive
+    elseif clientBuffData.chairBuffActive then
+        -- Buff no longer active
+        clientBuffData.chairBuffActive = false
     end
     
     -- UI: Show message when rest type changes (first time only)
@@ -408,7 +109,7 @@ Events.OnPlayerUpdate.Add(function(player)
         local messages = {
             [BetterResting.RestType.CHAIR] = "Resting on furniture - Enhanced stamina recovery",
             [BetterResting.RestType.VEHICLE] = "Resting in vehicle - Maximum stamina recovery",
-            [BetterResting.RestType.BED] = "Resting in bed - Wounds and muscle strain recovery",
+            [BetterResting.RestType.BED] = "Resting in bed - Wounds and muscle strain",
         }
         
         if messages[restType] then
@@ -445,37 +146,8 @@ Events.OnPlayerUpdate.Add(function(player)
     
     lastRestType = restType
     
-    -- Check if buff should be active (use shared data for single player compatibility)
-    local buffShouldBeActive = clientBuffData.chairBuffActive
-    
-    -- Check shared global data (works in single player where server sets this)
-    if BetterResting.ClientBuffData then
-            if BetterResting.ClientBuffData.chairBuffActive then
-                local currentGameHours = BetterResting.getCurrentGameHours()
-                if currentGameHours < BetterResting.ClientBuffData.chairBuffEndTime then
-                    buffShouldBeActive = true
-                    -- Sync client data
-                    if not clientBuffData.chairBuffActive then
-                        clientBuffData.chairBuffActive = true
-                        clientBuffData.lastIndicatorTime = 0
-                    end
-                else
-                    -- Buff expired
-                    if clientBuffData.chairBuffActive then
-                        showBuffExpired("chair")
-                    end
-                    BetterResting.ClientBuffData.chairBuffActive = false
-                end
-            else
-                -- Buff not active in shared data
-                if clientBuffData.chairBuffActive then
-                    clientBuffData.chairBuffActive = false
-                end
-            end
-    end
-    
     -- Show periodic indicator while buff is active
-    if buffShouldBeActive then
+    if clientBuffData.chairBuffActive then
         local currentTime = Calendar.getInstance():getTimeInMillis() / 1000 -- Current time in seconds
         local timeSinceLastIndicator = currentTime - clientBuffData.lastIndicatorTime
         

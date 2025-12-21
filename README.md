@@ -1,14 +1,18 @@
 # BetterResting - Project Zomboid Mod
 
-A mod for Project Zomboid Build 42 that enhances resting mechanics, providing better stamina recovery and health benefits when resting on furniture, in vehicles, or in beds.
+A mod for Project Zomboid Build 42 that enhances resting mechanics, making every moment of rest more meaningful and rewarding. No more wasting time on the floor when you could be getting proper recovery!
 
 ## Features
 
-- **Enhanced Chair/Sofa Resting**: Faster stamina recovery when resting on chairs, sofas, and other seating furniture
-- **Well Rested Buff**: After resting on furniture long enough to fully recover stamina, gain a temporary buff that reduces stamina consumption
-- **Vehicle Resting**: Improved stamina recovery while resting in vehicles
-- **Bed Resting**: Enhanced healing for wounds, muscle strain, and health when resting in beds
-- **Smart Detection**: Automatically detects when you're actually resting (not just walking through furniture)
+- **Enhanced Chair/Sofa Resting**: Rest on any chair, sofa, stool, or bench and experience noticeably faster stamina recovery. Take a proper rest and you'll feel the benefits long after you get up.
+
+- **Well Rested Buff**: Rest long enough on furniture to fully recover your stamina, and you'll gain a "Well Rested" buff that makes your activities less draining. The longer you rest, the longer the benefits last.
+
+- **Vehicle Resting**: Taking a break in your vehicle? You'll recover faster than just sitting on the ground. Perfect for those long road trips across Knox County.
+
+- **Bed Resting**: Beds, sleeping bags, cots, and tents now provide proper healing benefits. Your wounds will heal gradually, muscle strain will ease, and your overall health will improve while you rest.
+
+- **Smart Detection**: The mod intelligently knows when you're actually resting versus just passing through furniture, so you only get benefits when you deserve them.
 
 ## Installation
 

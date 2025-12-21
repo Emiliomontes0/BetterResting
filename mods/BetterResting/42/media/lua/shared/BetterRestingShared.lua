@@ -2,7 +2,7 @@
 -- Configuration accessible by both client and server
 
 BetterResting = BetterResting or {}
-BetterResting.Version = "1.0"
+BetterResting.Version = "1.1"
 BetterResting.ModID = "BetterResting"
 
 -- Configuration values
@@ -426,8 +426,351 @@ function BetterResting.detectRestType(player)
     return BetterResting.RestType.FLOOR
 end
 
+-- Check if we're on the server side (works in both single-player and multiplayer)
+local function isServerSide()
+    if isServer then
+        return isServer()
+    end
+    -- In single-player, client = server, so return true
+    -- In multiplayer client, return false
+    if isClient then
+        return not isClient()
+    end
+    -- Default: assume server (for single-player compatibility)
+    return true
+end
+
+-- Track player states (game mechanics) - server authoritative
+local playerRestData = {}
+
+-- Initialize player data tracking
+local function initPlayerData(player)
+    local playerNum = player:getPlayerNum()
+    if not playerRestData[playerNum] then
+        playerRestData[playerNum] = {
+            currentRestType = nil,
+            chairBuffActive = false,
+            chairBuffEndTime = 0,
+            lastStaminaLevel = 1.0,
+            wasFullStamina = false,
+            chairRestStartTime = 0,
+            lastRestType = nil,
+        }
+    end
+    return playerRestData[playerNum]
+end
+
+-- Track last heal time for each body part (for gradual healing)
+local bodyPartHealCooldowns = {}
+
+-- Track previous values to detect unexpected changes
+local previousValues = {}
+
+-- Apply chair buff when stamina is full
+local function applyChairBuff(player, data)
+    local stats = player:getStats()
+    if not stats then return end
+    
+    local stamina = stats:get(CharacterStat.ENDURANCE)
+    if not stamina then return end
+    
+    if stamina >= 0.99 and not data.wasFullStamina then
+        local currentGameHours = BetterResting.getCurrentGameHours()
+        local restDurationHours = currentGameHours - data.chairRestStartTime
+
+        if restDurationHours >= BetterResting.Config.MinChairRestTime then
+            local BuffDurationHours = math.min(
+                BetterResting.Config.MaxBuffDuration,
+                math.max(
+                    BetterResting.Config.MinBuffDuration,
+                    restDurationHours
+                )
+            )
+
+            data.chairBuffActive = true
+            data.chairBuffEndTime = currentGameHours + BuffDurationHours
+            
+            if not BetterResting.ClientBuffData then
+                BetterResting.ClientBuffData = {}
+            end
+            BetterResting.ClientBuffData.chairBuffEndTime = data.chairBuffEndTime
+            BetterResting.ClientBuffData.chairBuffActive = true
+
+            data.chairRestStartTime = 0
+        end
+        data.wasFullStamina = true
+    end
+    if stamina < 0.99 then 
+        data.wasFullStamina = false
+    end 
+end
+
+-- Process chair/sofa resting bonuses
+local function processChairResting(player, data, updateCounter)
+    local stats = player:getStats()
+    if not stats then return end
+    
+    local stamina = stats:get(CharacterStat.ENDURANCE)
+    if not stamina then return end
+    
+    if stamina < 1.0 then
+        local baseRegen = 0.001
+        local bonusRegen = baseRegen * (BetterResting.Config.ChairStaminaRegenMultiplier - 1.0)
+        local newStamina = math.min(1.0, stamina + bonusRegen)
+        stats:set(CharacterStat.ENDURANCE, newStamina)
+    end
+    
+    applyChairBuff(player, data)
+end
+
+-- Process vehicle resting bonuses
+local function processVehicleResting(player, data, updateCounter)
+    local stats = player:getStats()
+    if not stats then return end
+    
+    local stamina = stats:get(CharacterStat.ENDURANCE)
+    if not stamina then return end
+    
+    if stamina < 1.0 then
+        local baseRegen = 0.001
+        local bonusRegen = baseRegen * (BetterResting.Config.VehicleStaminaRegenMultiplier - 1.0)
+        local newStamina = math.min(1.0, stamina + bonusRegen)
+        stats:set(CharacterStat.ENDURANCE, newStamina)
+    end
+end
+
+-- Process bed resting bonuses
+local function processBedResting(player, data, updateCounter)
+    local bodyDamage = player:getBodyDamage()
+    if not bodyDamage then return end
+    
+    local stats = player:getStats()
+    if stats then
+        local stamina = stats:get(CharacterStat.ENDURANCE)
+        if stamina and stamina < 1.0 then
+            local baseRegen = 0.001
+            local bonusRegen = baseRegen * (BetterResting.Config.BedStaminaRegenMultiplier - 1.0)
+            local newStamina = math.min(1.0, stamina + bonusRegen)
+            stats:set(CharacterStat.ENDURANCE, newStamina)
+        end
+    end
+    
+    local health = bodyDamage:getHealth() / 100.0
+    if health and health < 1.0 then
+        local bodyParts = bodyDamage:getBodyParts()
+        if bodyParts then
+            local woundHealCooldown = 6
+            local playerKey = tostring(player:getPlayerNum())
+            
+            for i = 1, bodyParts:size() do
+                local part = bodyParts:get(i - 1)
+                if part then
+                    local partHealth = part:getHealth()
+                    if partHealth and partHealth < 100.0 then
+                        local partKey = playerKey .. "_" .. tostring(i)
+                        local lastWoundHeal = bodyPartHealCooldowns[partKey .. "_wound"] or 0
+                        local partHealed = false
+                        
+                        if updateCounter - lastWoundHeal >= woundHealCooldown then
+                            -- Reduce scratch time
+                            if part.getScratchTime and part.setScratchTime and part.setScratched then
+                                local scratchTime = part:getScratchTime()
+                                if scratchTime and scratchTime > 0 then
+                                    local reduction = 0.001 * BetterResting.Config.BedHPRegenMultiplier
+                                    local newTime = math.max(0, scratchTime - reduction)
+                                    if newTime <= 0 then
+                                        part:setScratched(false, true)
+                                    else
+                                        part:setScratchTime(newTime)
+                                    end
+                                    partHealed = true
+                                end
+                            end
+                            
+                            -- Reduce cut time
+                            if part.getCutTime and part.setCutTime and part.setCut then
+                                local cutTime = part:getCutTime()
+                                if cutTime and cutTime > 0 then
+                                    local reduction = 0.001 * BetterResting.Config.BedHPRegenMultiplier
+                                    local newTime = math.max(0, cutTime - reduction)
+                                    if newTime <= 0 then
+                                        part:setCut(false)
+                                    else
+                                        part:setCutTime(newTime)
+                                    end
+                                    partHealed = true
+                                end
+                            end
+                            
+                            -- Reduce deep wound time
+                            if part.getDeepWoundTime and part.setDeepWoundTime and part.setDeepWounded then
+                                local deepWoundTime = part:getDeepWoundTime()
+                                if deepWoundTime and deepWoundTime > 0 then
+                                    local reduction = 0.001 * BetterResting.Config.BedHPRegenMultiplier
+                                    local newTime = math.max(0, deepWoundTime - reduction)
+                                    part:setDeepWoundTime(newTime)
+                                    if newTime <= 0 then
+                                        part:setDeepWounded(false)
+                                    end
+                                    partHealed = true
+                                end
+                            end
+                            
+                            -- Reduce bleeding time
+                            if part.getBleedingTime and part.setBleedingTime then
+                                local bleedingTime = part:getBleedingTime()
+                                if bleedingTime and bleedingTime > 0 then
+                                    local reduction = 0.001 * BetterResting.Config.BedHPRegenMultiplier
+                                    local newTime = math.max(0, bleedingTime - reduction)
+                                    part:setBleedingTime(newTime)
+                                    partHealed = true
+                                end
+                            end
+                            
+                            -- Reduce muscle strain (stiffness)
+                            if part.getStiffness and part.setStiffness then
+                                local stiffness = part:getStiffness()
+                                if stiffness and stiffness > 0 then
+                                    local oldStiffness = stiffness
+                                    local partKeyStiff = playerKey .. "_part" .. i .. "_stiffness"
+                                    local previousStiffness = previousValues[partKeyStiff]
+                                    
+                                    if previousStiffness and math.abs(stiffness - previousStiffness) > 0.5 then
+                                        print(string.format("[BetterResting SHARED] WARNING: Stiffness changed unexpectedly! Expected ~%.2f but got %.2f", 
+                                            previousStiffness, stiffness))
+                                    end
+                                    
+                                    local reduction = 0.005 * BetterResting.Config.BedMuscleFatigueReduction * 100
+                                    local newStiffness = math.max(0, stiffness - reduction)
+                                    
+                                    if updateCounter % 60 == 0 then
+                                        print(string.format("[BetterResting SHARED] Part %d: Stiffness %.2f -> %.2f (tick %d)", 
+                                            i, oldStiffness, newStiffness, updateCounter))
+                                    end
+                                    
+                                    part:setStiffness(newStiffness)
+                                    
+                                    local verifyStiffness = part:getStiffness()
+                                    if math.abs(verifyStiffness - newStiffness) > 0.01 then
+                                        print(string.format("[BetterResting SHARED] WARNING: Stiffness mismatch! Set %.2f but got %.2f", 
+                                            newStiffness, verifyStiffness))
+                                    end
+                                    
+                                    previousValues[partKeyStiff] = newStiffness
+                                    
+                                    if newStiffness <= 0 and player.getFitness then
+                                        local fitness = player:getFitness()
+                                        if fitness and fitness.removeStiffnessValue then
+                                            fitness:removeStiffnessValue(BodyPartType.ToString(part:getType()))
+                                        end
+                                    end
+                                    
+                                    partHealed = true
+                                end
+                            end
+                            
+                            if partHealed then
+                                bodyPartHealCooldowns[partKey .. "_wound"] = updateCounter
+                            end
+                        end
+                        
+                        if part.RestoreToFullHealth and partHealth < 70.0 then
+                            local lastHeal = bodyPartHealCooldowns[partKey] or 0
+                            local healCooldown = math.max(1, math.floor(600 / BetterResting.Config.BedHPRegenMultiplier))
+                            
+                            if updateCounter - lastHeal >= healCooldown then
+                                part:RestoreToFullHealth()
+                                bodyPartHealCooldowns[partKey] = updateCounter
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    -- Reduce muscle fatigue faster
+    local parts = bodyDamage:getBodyParts()
+    if parts then
+        for i = 0, parts:size() - 1 do
+            local part = parts:get(i)
+            if part then
+                if part.getPain and part.setPain then
+                    local pain = part:getPain()
+                    if pain and pain > 0 then
+                        local reduction = pain * BetterResting.Config.BedMuscleFatigueReduction * 0.01
+                        local newPain = math.max(0, pain - reduction)
+                        part:setPain(newPain)
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- Main server update loop - handles game mechanics (runs in shared script with server check)
+local updateCounter = 0
+local hasLoggedStart = false
+
+Events.OnPlayerUpdate.Add(function(player)
+    if not player then return end
+    
+    -- Only run game mechanics on server side
+    if not isServerSide() then
+        return
+    end
+    
+    -- Log first time to confirm it's running
+    if not hasLoggedStart then
+        print("[BetterResting SHARED] OnPlayerUpdate handler is ACTIVE on server side!")
+        hasLoggedStart = true
+    end
+    
+    updateCounter = updateCounter + 1
+    
+    local data = initPlayerData(player)
+    local restType = BetterResting.detectRestType(player)
+
+    if data.lastRestType ~= restType then
+        if restType == BetterResting.RestType.CHAIR then 
+            data.chairRestStartTime = BetterResting.getCurrentGameHours()
+        elseif data.lastRestType == BetterResting.RestType.CHAIR then 
+            data.chairRestStartTime = 0
+            data.wasFullStamina = false
+        end
+    end
+    
+    data.lastRestType = restType
+    data.currentRestType = restType
+    
+    if restType == BetterResting.RestType.CHAIR then
+        processChairResting(player, data, updateCounter)
+    elseif restType == BetterResting.RestType.VEHICLE then
+        processVehicleResting(player, data, updateCounter)
+    elseif restType == BetterResting.RestType.BED then
+        if updateCounter % 60 == 0 then
+            print(string.format("[BetterResting SHARED] Processing BED resting (tick %d)", updateCounter))
+        end
+        processBedResting(player, data, updateCounter)
+    end
+    
+    if data.chairBuffActive then
+        local currentHours = BetterResting.getCurrentGameHours()
+        if currentHours >= data.chairBuffEndTime then
+            data.chairBuffActive = false
+            if BetterResting.ClientBuffData then
+                BetterResting.ClientBuffData.chairBuffActive = false
+                BetterResting.ClientBuffData.chairBuffEndTime = 0
+            end
+        end
+    end
+end)
+
 -- Use both print and writeLog to ensure we see output
+print("=========================================")
 print("BetterResting shared script loaded - Version " .. BetterResting.Version)
+print("BetterResting - GAME MECHANICS ENABLED IN SHARED SCRIPT")
+print("=========================================")
 if writeLog then
     writeLog("BetterResting", "Shared script loaded - Version " .. BetterResting.Version)
 end
@@ -435,4 +778,7 @@ end
 -- Also verify on game start
 Events.OnGameStart.Add(function()
     print("BetterResting [EVENT] OnGameStart fired - Shared script confirmed loaded!")
+    print("BetterResting [SHARED] isServer check: " .. tostring(isServer and isServer() or "function not available"))
+    print("BetterResting [SHARED] isClient check: " .. tostring(isClient and isClient() or "function not available"))
+    print("BetterResting [SHARED] isServerSide() = " .. tostring(isServerSide()))
 end)
