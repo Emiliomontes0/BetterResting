@@ -208,17 +208,27 @@ function BetterResting.detectRestType(player)
             local bedType = nil
             
             -- Try to get BedType property directly
+            -- Wrap in pcall to safely handle API errors (props:get may not accept string arguments)
             if obj.getProperties then
                 local props = obj:getProperties()
                 if props then
-                    if props:get("bed") then
+                    -- Safely try to get "bed" property
+                    local success, result = pcall(function() return props:get("bed") end)
+                    if success and result then
                         hasBedProperty = true
                     end
-                    if props:get("chairS") or props:get("chair") then
+                    
+                    -- Safely try to get chair properties
+                    local success1, result1 = pcall(function() return props:get("chairS") end)
+                    local success2, result2 = pcall(function() return props:get("chair") end)
+                    if (success1 and result1) or (success2 and result2) then
                         hasChairProperty = true
                     end
-                    if props:get("BedType") then
-                        bedType = props:get("BedType")
+                    
+                    -- Safely try to get BedType property
+                    local success3, result3 = pcall(function() return props:get("BedType") end)
+                    if success3 and result3 then
+                        bedType = result3
                     end
                 end
             end
