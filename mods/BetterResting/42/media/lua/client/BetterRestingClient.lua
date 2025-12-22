@@ -81,6 +81,11 @@ Events.OnPlayerUpdate.Add(function(player)
     -- Detect rest type for UI messages only
     local restType = BetterResting.detectRestType(player)
     
+    -- Debug logging for rest type detection
+    if restType ~= lastRestType then
+        print("[BetterResting CLIENT] Rest type changed: " .. tostring(lastRestType) .. " -> " .. tostring(restType))
+    end
+    
     -- Check for buff activation (server sets this in BetterResting.ClientBuffData)
     if BetterResting.ClientBuffData and BetterResting.ClientBuffData.chairBuffActive then
         local currentGameHours = BetterResting.getCurrentGameHours()
@@ -113,28 +118,44 @@ Events.OnPlayerUpdate.Add(function(player)
         }
         
         if messages[restType] then
-            -- Start extended message display
+            print("[BetterResting CLIENT] Showing message for rest type: " .. tostring(restType) .. " - " .. messages[restType])
+            -- Start extended message display (reset timer when type changes)
             restMessageData.startTick = updateCounter
             restMessageData.message = messages[restType]
             restMessageData.lastRefresh = updateCounter
             HaloTextHelper.addTextWithArrow(player, messages[restType], true, 0, 100, 255)
+        else
+            print("[BetterResting CLIENT] WARNING: No message found for rest type: " .. tostring(restType))
         end
     end
     
     -- Refresh message periodically for extended display duration
-    if restMessageData.message and restType ~= BetterResting.RestType.FLOOR then
-        local elapsed = updateCounter - restMessageData.startTick
-        if elapsed < restMessageData.duration then
-            -- Refresh message at intervals to keep it visible
-            if updateCounter - restMessageData.lastRefresh >= restMessageData.refreshInterval then
-                HaloTextHelper.addTextWithArrow(player, restMessageData.message, true, 0, 100, 255)
-                restMessageData.lastRefresh = updateCounter
+    -- Always use current rest type's message to ensure it's up to date
+    if restType ~= BetterResting.RestType.FLOOR then
+        local messages = {
+            [BetterResting.RestType.CHAIR] = "Resting on furniture - Enhanced stamina recovery",
+            [BetterResting.RestType.VEHICLE] = "Resting in vehicle - Maximum stamina recovery",
+            [BetterResting.RestType.BED] = "Resting in bed - Wounds and muscle strain",
+        }
+        
+        local currentMessage = messages[restType]
+        if currentMessage then
+            -- Update stored message to current rest type
+            restMessageData.message = currentMessage
+            
+            local elapsed = updateCounter - restMessageData.startTick
+            if elapsed < restMessageData.duration then
+                -- Refresh message at intervals to keep it visible
+                if updateCounter - restMessageData.lastRefresh >= restMessageData.refreshInterval then
+                    HaloTextHelper.addTextWithArrow(player, currentMessage, true, 0, 100, 255)
+                    restMessageData.lastRefresh = updateCounter
+                end
+            else
+                -- Duration expired, clear message
+                restMessageData.message = nil
             end
-        else
-            -- Duration expired, clear message
-            restMessageData.message = nil
         end
-    elseif restType == BetterResting.RestType.FLOOR then
+    else
         -- Clear message when no longer resting
         restMessageData.message = nil
     end

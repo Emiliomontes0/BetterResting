@@ -67,833 +67,165 @@ BetterResting.BedCustomItems = {
     ["Base.Mov_FlatCoffin"] = true,
 }
 
--- Sprite Name Lookup Tables
--- Generated from bedtype_tiles.md - 707 sprites total (264 beds, 443 chairs)
--- These provide exact sprite name matching for reliable detection
-BetterResting.BedSprites = {
-    ["camping_01_0"] = true,  -- Tent (badBed)
-    ["camping_01_1"] = true,  -- Tent (badBed)
-    ["camping_01_2"] = true,  -- Tent (badBed)
-    ["camping_01_3"] = true,  -- Tent (badBed)
-    ["camping_02_0"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_1"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_10"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_11"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_12"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_13"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_14"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_15"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_16"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_17"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_18"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_19"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_2"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_20"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_21"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_22"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_23"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_24"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_25"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_26"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_27"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_28"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_29"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_3"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_30"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_31"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_32"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_33"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_34"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_35"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_36"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_37"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_38"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_39"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_4"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_40"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_41"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_42"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_43"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_44"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_45"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_46"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_47"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_48"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_49"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_5"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_50"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_51"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_52"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_53"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_54"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_55"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_56"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_57"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_58"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_59"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_6"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_60"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_61"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_62"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_63"] = true,  -- Cheap Sleeping Bag (badBed)
-    ["camping_02_64"] = true,  -- Spiffo Sleeping Bag (badBed)
-    ["camping_02_65"] = true,  -- Spiffo Sleeping Bag (badBed)
-    ["camping_02_66"] = true,  -- Spiffo Sleeping Bag (badBed)
-    ["camping_02_67"] = true,  -- Spiffo Sleeping Bag (badBed)
-    ["camping_02_68"] = true,  -- Spiffo Sleeping Bag (badBed)
-    ["camping_02_69"] = true,  -- Spiffo Sleeping Bag (badBed)
-    ["camping_02_7"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_70"] = true,  -- Spiffo Sleeping Bag (badBed)
-    ["camping_02_71"] = true,  -- Spiffo Sleeping Bag (badBed)
-    ["camping_02_72"] = true,  -- High Quality Sleeping Bag (badBed)
-    ["camping_02_73"] = true,  -- High Quality Sleeping Bag (badBed)
-    ["camping_02_74"] = true,  -- High Quality Sleeping Bag (badBed)
-    ["camping_02_75"] = true,  -- High Quality Sleeping Bag (badBed)
-    ["camping_02_76"] = true,  -- High Quality Sleeping Bag (badBed)
-    ["camping_02_77"] = true,  -- High Quality Sleeping Bag (badBed)
-    ["camping_02_78"] = true,  -- High Quality Sleeping Bag (badBed)
-    ["camping_02_79"] = true,  -- High Quality Sleeping Bag (badBed)
-    ["camping_02_8"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_02_80"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_81"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_82"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_83"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_84"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_85"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_86"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_87"] = true,  -- Sleeping Bag (badBed)
-    ["camping_02_9"] = true,  -- Plaid Sleeping Bag (badBed)
-    ["camping_03_0"] = true,  -- Shelter (badBed)
-    ["camping_03_1"] = true,  -- Shelter (badBed)
-    ["camping_03_10"] = true,  -- Shelter (badBed)
-    ["camping_03_11"] = true,  -- Shelter (badBed)
-    ["camping_03_12"] = true,  -- Shelter (badBed)
-    ["camping_03_13"] = true,  -- Shelter (badBed)
-    ["camping_03_14"] = true,  -- Shelter (badBed)
-    ["camping_03_15"] = true,  -- Shelter (badBed)
-    ["camping_03_2"] = true,  -- Shelter (badBed)
-    ["camping_03_24"] = true,  -- Tent (badBed)
-    ["camping_03_25"] = true,  -- Tent (badBed)
-    ["camping_03_26"] = true,  -- Tent (badBed)
-    ["camping_03_27"] = true,  -- Tent (badBed)
-    ["camping_03_3"] = true,  -- Shelter (badBed)
-    ["camping_03_32"] = true,  -- Tent (badBed)
-    ["camping_03_33"] = true,  -- Tent (badBed)
-    ["camping_03_34"] = true,  -- Tent (badBed)
-    ["camping_03_35"] = true,  -- Tent (badBed)
-    ["camping_03_36"] = true,  -- Tent (badBed)
-    ["camping_03_37"] = true,  -- Tent (badBed)
-    ["camping_03_38"] = true,  -- Tent (badBed)
-    ["camping_03_39"] = true,  -- Tent (badBed)
-    ["camping_03_4"] = true,  -- Shelter (badBed)
-    ["camping_03_40"] = true,  -- Shelter (badBed)
-    ["camping_03_41"] = true,  -- Shelter (badBed)
-    ["camping_03_42"] = true,  -- Shelter (badBed)
-    ["camping_03_43"] = true,  -- Shelter (badBed)
-    ["camping_03_44"] = true,  -- Shelter (badBed)
-    ["camping_03_45"] = true,  -- Shelter (badBed)
-    ["camping_03_46"] = true,  -- Shelter (badBed)
-    ["camping_03_47"] = true,  -- Shelter (badBed)
-    ["camping_03_5"] = true,  -- Shelter (badBed)
-    ["camping_03_6"] = true,  -- Shelter (badBed)
-    ["camping_03_7"] = true,  -- Shelter (badBed)
-    ["camping_03_8"] = true,  -- Shelter (badBed)
-    ["camping_03_9"] = true,  -- Shelter (badBed)
-    ["camping_04_100"] = true,  -- Tent (badBed)
-    ["camping_04_111"] = true,  -- Tent (badBed)
-    ["camping_04_119"] = true,  -- Tent (badBed)
-    ["camping_04_124"] = true,  -- Tent (badBed)
-    ["camping_04_15"] = true,  -- Tent (badBed)
-    ["camping_04_23"] = true,  -- Tent (badBed)
-    ["camping_04_28"] = true,  -- Tent (badBed)
-    ["camping_04_36"] = true,  -- Tent (badBed)
-    ["camping_04_4"] = true,  -- Tent (badBed)
-    ["camping_04_47"] = true,  -- Tent (badBed)
-    ["camping_04_55"] = true,  -- Tent (badBed)
-    ["camping_04_60"] = true,  -- Tent (badBed)
-    ["camping_04_68"] = true,  -- Tent (badBed)
-    ["camping_04_79"] = true,  -- Tent (badBed)
-    ["camping_04_87"] = true,  -- Tent (badBed)
-    ["camping_04_92"] = true,  -- Tent (badBed)
-    ["crafted_02_85"] = true,  -- Block (badBed)
-    ["crafted_02_86"] = true,  -- Stump (badBed)
-    ["crafted_04_44"] = true,  -- Coffin (badBed)
-    ["crafted_04_47"] = true,  -- Coffin (badBed)
-    ["crafted_04_48"] = true,  -- Coffin (badBed)
-    ["crafted_04_51"] = true,  -- Coffin (badBed)
-    ["crafted_04_52"] = true,  -- Coffin (badBed)
-    ["crafted_04_53"] = true,  -- Coffin (badBed)
-    ["crafted_04_54"] = true,  -- Coffin (badBed)
-    ["crafted_04_55"] = true,  -- Coffin (badBed)
-    ["furniture_bedding_01_0"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_1"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_10"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_11"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_12"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_13"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_14"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_15"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_16"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_17"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_18"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_19"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_2"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_20"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_21"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_22"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_23"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_24"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_25"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_26"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_27"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_28"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_29"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_3"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_30"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_31"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_32"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_33"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_34"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_35"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_36"] = true,  -- Beds (goodBed)
-    ["furniture_bedding_01_37"] = true,  -- Beds (goodBed)
-    ["furniture_bedding_01_38"] = true,  -- Beds (goodBed)
-    ["furniture_bedding_01_39"] = true,  -- Beds (goodBed)
-    ["furniture_bedding_01_4"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_40"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_41"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_42"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_43"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_44"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_45"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_46"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_47"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_48"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_49"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_5"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_50"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_51"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_52"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_53"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_54"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_55"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_56"] = true,  -- Bed (averageBed)
-    ["furniture_bedding_01_57"] = true,  -- Bed (averageBed)
-    ["furniture_bedding_01_58"] = true,  -- Bed (averageBed)
-    ["furniture_bedding_01_59"] = true,  -- Bed (averageBed)
-    ["furniture_bedding_01_6"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_60"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_61"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_62"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_63"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_64"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_65"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_66"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_67"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_68"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_69"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_7"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_70"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_71"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_72"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_73"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_74"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_75"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_76"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_77"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_78"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_79"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_8"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_80"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_81"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_82"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_83"] = true,  -- Bed (goodBed)
-    ["furniture_bedding_01_84"] = true,  -- Beds (goodBed)
-    ["furniture_bedding_01_85"] = true,  -- Beds (goodBed)
-    ["furniture_bedding_01_86"] = true,  -- Beds (goodBed)
-    ["furniture_bedding_01_87"] = true,  -- Beds (goodBed)
-    ["furniture_bedding_01_9"] = true,  -- Bed (goodBed)
-    ["location_community_medical_01_16"] = true,  -- Bed (goodBed)
-    ["location_community_medical_01_17"] = true,  -- Bed (goodBed)
-    ["location_community_medical_01_18"] = true,  -- Bed (goodBed)
-    ["location_community_medical_01_19"] = true,  -- Bed (goodBed)
-    ["location_community_medical_01_20"] = true,  -- Bed (goodBed)
-    ["location_community_medical_01_21"] = true,  -- Bed (goodBed)
-    ["location_community_medical_01_22"] = true,  -- Bed (goodBed)
-    ["location_community_medical_01_23"] = true,  -- Bed (goodBed)
-    ["location_community_medical_01_72"] = true,  -- Bed (averageBed)
-    ["location_community_medical_01_73"] = true,  -- Bed (averageBed)
-    ["location_community_medical_01_74"] = true,  -- Bed (averageBed)
-    ["location_community_medical_01_75"] = true,  -- Bed (averageBed)
-    ["recreational_sports_01_34"] = true,  -- Mat (badBed)
-    ["recreational_sports_01_35"] = true,  -- Mat (badBed)
-    ["vegetation_farm_01_10"] = true,  -- Double Stacked Hay (badBed)
-    ["vegetation_farm_01_11"] = true,  -- Double Stacked Hay (badBed)
-    ["vegetation_farm_01_16"] = true,  -- Single Stacked Hay (badBed)
-    ["vegetation_farm_01_17"] = true,  -- Single Stacked Hay (badBed)
-    ["vegetation_farm_01_18"] = true,  -- Double Stacked Hay (badBed)
-    ["vegetation_farm_01_19"] = true,  -- Double Stacked Hay (badBed)
-    ["vegetation_farm_01_8"] = true,  -- Single Stacked Hay (badBed)
-    ["vegetation_farm_01_9"] = true,  -- Single Stacked Hay (badBed)
-}
-
-BetterResting.ChairSprites = {
-    ["camping_01_10"] = true,  -- Table (badBed)
-    ["camping_01_11"] = true,  -- Table (badBed)
-    ["camping_01_12"] = true,  -- Table (badBed)
-    ["camping_01_13"] = true,  -- Table (badBed)
-    ["camping_01_14"] = true,  -- Table (badBed)
-    ["camping_01_15"] = true,  -- Table (badBed)
-    ["camping_01_8"] = true,  -- Table (badBed)
-    ["camping_01_9"] = true,  -- Table (badBed)
-    ["carpentry_01_36"] = true,  -- Chair (badBed)
-    ["carpentry_01_37"] = true,  -- Chair (badBed)
-    ["carpentry_01_38"] = true,  -- Chair (badBed)
-    ["carpentry_01_39"] = true,  -- Chair (badBed)
-    ["carpentry_01_40"] = true,  -- Chair (badBed)
-    ["carpentry_01_41"] = true,  -- Chair (badBed)
-    ["carpentry_01_42"] = true,  -- Chair (badBed)
-    ["carpentry_01_43"] = true,  -- Chair (badBed)
-    ["carpentry_01_44"] = true,  -- Chair (badBed)
-    ["carpentry_01_45"] = true,  -- Chair (badBed)
-    ["carpentry_01_46"] = true,  -- Chair (badBed)
-    ["carpentry_01_47"] = true,  -- Chair (badBed)
-    ["crafted_02_56"] = true,  -- Bench (badBed)
-    ["crafted_02_57"] = true,  -- Bench (badBed)
-    ["crafted_02_58"] = true,  -- Bench (badBed)
-    ["crafted_02_59"] = true,  -- Bench (badBed)
-    ["crafted_02_92"] = true,  -- Stool (badBed)
-    ["crafted_02_93"] = true,  -- Stool (badBed)
-    ["crafted_02_94"] = true,  -- Stool (badBed)
-    ["crafted_02_95"] = true,  -- Stool (badBed)
-    ["crafted_04_112"] = true,  -- Stool (badBed)
-    ["crafted_04_113"] = true,  -- Stool (badBed)
-    ["furniture_seating_indoor_01_0"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_1"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_10"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_01_11"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_01_12"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_01_13"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_01_14"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_01_15"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_01_16"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_17"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_18"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_19"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_2"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_20"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_21"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_22"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_23"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_24"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_25"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_26"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_27"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_28"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_29"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_3"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_30"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_31"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_32"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_01_33"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_01_34"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_01_35"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_01_36"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_37"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_38"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_39"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_4"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_40"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_41"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_42"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_43"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_44"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_01_45"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_01_46"] = true,  -- Ottoman (badBed)
-    ["furniture_seating_indoor_01_47"] = true,  -- Ottoman (badBed)
-    ["furniture_seating_indoor_01_48"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_49"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_5"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_50"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_51"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_52"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_53"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_54"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_55"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_56"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_57"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_58"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_59"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_6"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_60"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_61"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_62"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_63"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_01_7"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_01_8"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_01_9"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_02_0"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_1"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_10"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_11"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_12"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_13"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_14"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_15"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_16"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_02_17"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_02_18"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_02_19"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_02_2"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_20"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_02_21"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_02_22"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_02_23"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_02_24"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_25"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_26"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_27"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_28"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_29"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_3"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_30"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_31"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_32"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_33"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_34"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_35"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_36"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_37"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_38"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_39"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_4"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_40"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_02_41"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_02_42"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_02_43"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_02_44"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_02_45"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_02_46"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_02_47"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_02_48"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_49"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_5"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_50"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_51"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_52"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_53"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_54"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_55"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_02_56"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_57"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_58"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_59"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_6"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_60"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_02_61"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_02_62"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_02_63"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_02_7"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_8"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_02_9"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_0"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_03_1"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_03_10"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_100"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_101"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_102"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_103"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_104"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_105"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_106"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_107"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_108"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_109"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_11"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_110"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_111"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_112"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_113"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_114"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_115"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_116"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_117"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_118"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_119"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_12"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_120"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_121"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_122"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_123"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_124"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_125"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_126"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_127"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_128"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_129"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_13"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_130"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_131"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_132"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_133"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_134"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_135"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_136"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_137"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_138"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_139"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_14"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_140"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_141"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_142"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_143"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_144"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_145"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_146"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_147"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_148"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_149"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_15"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_150"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_151"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_16"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_17"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_18"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_19"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_2"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_03_20"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_21"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_22"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_23"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_24"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_25"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_26"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_27"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_28"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_29"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_3"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_03_30"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_31"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_32"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_33"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_34"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_35"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_36"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_37"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_38"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_39"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_4"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_40"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_41"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_42"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_43"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_44"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_45"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_46"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_47"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_48"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_49"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_5"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_50"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_51"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_52"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_03_53"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_03_54"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_03_55"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_03_56"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_57"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_58"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_59"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_6"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_60"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_61"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_64"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_03_65"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_03_66"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_03_67"] = true,  -- Bench (badBed)
-    ["furniture_seating_indoor_03_68"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_69"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_7"] = true,  -- Chair (averageBed)
-    ["furniture_seating_indoor_03_70"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_71"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_72"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_73"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_74"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_75"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_76"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_77"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_78"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_79"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_8"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_80"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_81"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_82"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_83"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_84"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_85"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_86"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_87"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_88"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_89"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_9"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_90"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_91"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_92"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_93"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_94"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_95"] = true,  -- Couch (averageBed)
-    ["furniture_seating_indoor_03_96"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_97"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_98"] = true,  -- Chair (badBed)
-    ["furniture_seating_indoor_03_99"] = true,  -- Chair (badBed)
-    ["furniture_seating_outdoor_01_0"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_1"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_10"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_11"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_12"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_13"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_14"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_15"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_16"] = true,  -- Chair (badBed)
-    ["furniture_seating_outdoor_01_17"] = true,  -- Chair (badBed)
-    ["furniture_seating_outdoor_01_18"] = true,  -- Chair (badBed)
-    ["furniture_seating_outdoor_01_19"] = true,  -- Chair (badBed)
-    ["furniture_seating_outdoor_01_2"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_20"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_21"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_22"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_23"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_24"] = true,  -- Chair (badBed)
-    ["furniture_seating_outdoor_01_25"] = true,  -- Chair (badBed)
-    ["furniture_seating_outdoor_01_26"] = true,  -- Chair (badBed)
-    ["furniture_seating_outdoor_01_27"] = true,  -- Chair (badBed)
-    ["furniture_seating_outdoor_01_28"] = true,  -- Chair (badBed)
-    ["furniture_seating_outdoor_01_29"] = true,  -- Chair (badBed)
-    ["furniture_seating_outdoor_01_3"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_30"] = true,  -- Chair (badBed)
-    ["furniture_seating_outdoor_01_31"] = true,  -- Chair (badBed)
-    ["furniture_seating_outdoor_01_4"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_5"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_6"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_7"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_8"] = true,  -- Bench (badBed)
-    ["furniture_seating_outdoor_01_9"] = true,  -- Bench (badBed)
-    ["location_community_church_small_01_48"] = true,  -- Pew (badBed)
-    ["location_community_church_small_01_49"] = true,  -- Pew (badBed)
-    ["location_community_church_small_01_50"] = true,  -- Pew (badBed)
-    ["location_community_church_small_01_51"] = true,  -- Pew (badBed)
-    ["location_community_church_small_01_52"] = true,  -- Pew (badBed)
-    ["location_community_church_small_01_53"] = true,  -- Pew (badBed)
-    ["location_community_church_small_01_56"] = true,  -- Pew (badBed)
-    ["location_community_church_small_01_57"] = true,  -- Pew (badBed)
-    ["location_community_church_small_01_58"] = true,  -- Pew (badBed)
-    ["location_community_church_small_01_59"] = true,  -- Pew (badBed)
-    ["location_community_church_small_01_60"] = true,  -- Pew (badBed)
-    ["location_community_church_small_01_61"] = true,  -- Pew (badBed)
-    ["location_community_medical_01_32"] = true,  -- Chair (averageBed)
-    ["location_community_medical_01_33"] = true,  -- Chair (averageBed)
-    ["location_community_medical_01_34"] = true,  -- Chair (averageBed)
-    ["location_community_medical_01_35"] = true,  -- Chair (averageBed)
-    ["location_community_medical_01_56"] = true,  -- Chairs (badBed)
-    ["location_community_medical_01_57"] = true,  -- Chairs (badBed)
-    ["location_community_medical_01_58"] = true,  -- Chairs (badBed)
-    ["location_community_medical_01_59"] = true,  -- Chairs (badBed)
-    ["location_community_medical_01_60"] = true,  -- Chairs (badBed)
-    ["location_community_medical_01_61"] = true,  -- Chairs (badBed)
-    ["location_community_medical_01_62"] = true,  -- Chairs (badBed)
-    ["location_community_medical_01_63"] = true,  -- Chairs (badBed)
-    ["location_community_medical_01_76"] = true,  -- Table (badBed)
-    ["location_community_medical_01_77"] = true,  -- Table (badBed)
-    ["location_community_medical_01_78"] = true,  -- Table (badBed)
-    ["location_community_medical_01_79"] = true,  -- Table (badBed)
-    ["location_entertainment_theatre_01_0"] = true,  -- Chair (badBed)
-    ["location_entertainment_theatre_01_1"] = true,  -- Chair (badBed)
-    ["location_entertainment_theatre_01_2"] = true,  -- Chair (badBed)
-    ["location_entertainment_theatre_01_3"] = true,  -- Chair (badBed)
-    ["location_entertainment_theatre_01_88"] = true,  -- Chair (badBed)
-    ["location_entertainment_theatre_01_89"] = true,  -- Chair (badBed)
-    ["location_entertainment_theatre_01_90"] = true,  -- Chair (badBed)
-    ["location_entertainment_theatre_01_91"] = true,  -- Chair (badBed)
-    ["location_restaurant_bar_01_10"] = true,  -- Seating (averageBed)
-    ["location_restaurant_bar_01_11"] = true,  -- Seating (averageBed)
-    ["location_restaurant_bar_01_12"] = true,  -- Seating (averageBed)
-    ["location_restaurant_bar_01_13"] = true,  -- Seating (averageBed)
-    ["location_restaurant_bar_01_14"] = true,  -- Seating (averageBed)
-    ["location_restaurant_bar_01_15"] = true,  -- Seating (averageBed)
-    ["location_restaurant_bar_01_25"] = true,  -- Blue Bar Stool (badBed)
-    ["location_restaurant_bar_01_26"] = true,  -- Bar Stool (badBed)
-    ["location_restaurant_bar_01_8"] = true,  -- Seating (averageBed)
-    ["location_restaurant_bar_01_9"] = true,  -- Seating (averageBed)
-    ["location_restaurant_diner_01_32"] = true,  -- Seat (averageBed)
-    ["location_restaurant_diner_01_33"] = true,  -- Seat (averageBed)
-    ["location_restaurant_diner_01_34"] = true,  -- Seat (averageBed)
-    ["location_restaurant_diner_01_35"] = true,  -- Seat (averageBed)
-    ["location_restaurant_diner_01_36"] = true,  -- Seat (averageBed)
-    ["location_restaurant_diner_01_37"] = true,  -- Seat (averageBed)
-    ["location_restaurant_diner_01_38"] = true,  -- Seat (averageBed)
-    ["location_restaurant_diner_01_39"] = true,  -- Seat (averageBed)
-    ["location_restaurant_diner_01_42"] = true,  -- 50s Barstool (badBed)
-    ["location_restaurant_generic_01_0"] = true,  -- Picknic Table (badBed)
-    ["location_restaurant_generic_01_1"] = true,  -- Picknic Table (badBed)
-    ["location_restaurant_generic_01_10"] = true,  -- Picknic Table (badBed)
-    ["location_restaurant_generic_01_11"] = true,  -- Picknic Table (badBed)
-    ["location_restaurant_generic_01_12"] = true,  -- Picknic Table (badBed)
-    ["location_restaurant_generic_01_13"] = true,  -- Picknic Table (badBed)
-    ["location_restaurant_generic_01_14"] = true,  -- Picknic Table (badBed)
-    ["location_restaurant_generic_01_15"] = true,  -- Picknic Table (badBed)
-    ["location_restaurant_generic_01_2"] = true,  -- Picknic Table (badBed)
-    ["location_restaurant_generic_01_3"] = true,  -- Picknic Table (badBed)
-    ["location_restaurant_generic_01_4"] = true,  -- Picknic Table (badBed)
-    ["location_restaurant_generic_01_5"] = true,  -- Picknic Table (badBed)
-    ["location_restaurant_generic_01_6"] = true,  -- Picknic Table (badBed)
-    ["location_restaurant_generic_01_7"] = true,  -- Picknic Table (badBed)
-    ["location_restaurant_generic_01_8"] = true,  -- Picknic Table (badBed)
-    ["location_restaurant_generic_01_9"] = true,  -- Picknic Table (badBed)
-    ["location_restaurant_pizzawhirled_01_40"] = true,  -- Seat (averageBed)
-    ["location_restaurant_pizzawhirled_01_41"] = true,  -- Seat (averageBed)
-    ["location_restaurant_pizzawhirled_01_42"] = true,  -- Seat (averageBed)
-    ["location_restaurant_pizzawhirled_01_43"] = true,  -- Seat (averageBed)
-    ["location_restaurant_pizzawhirled_01_44"] = true,  -- Seat (averageBed)
-    ["location_restaurant_pizzawhirled_01_45"] = true,  -- Seat (averageBed)
-    ["location_restaurant_pizzawhirled_01_46"] = true,  -- Seat (averageBed)
-    ["location_restaurant_pizzawhirled_01_47"] = true,  -- Seat (averageBed)
-    ["location_restaurant_spiffos_02_16"] = true,  -- Seat (badBed)
-    ["location_restaurant_spiffos_02_17"] = true,  -- Seat (badBed)
-    ["location_restaurant_spiffos_02_18"] = true,  -- Seat (badBed)
-    ["location_restaurant_spiffos_02_19"] = true,  -- Seat (badBed)
-    ["location_restaurant_spiffos_02_20"] = true,  -- Seat (badBed)
-    ["location_restaurant_spiffos_02_21"] = true,  -- Seat (badBed)
-    ["location_restaurant_spiffos_02_22"] = true,  -- Seat (badBed)
-    ["location_restaurant_spiffos_02_23"] = true,  -- Seat (badBed)
-    ["location_restaurant_spiffos_02_24"] = true,  -- Chair (badBed)
-    ["location_restaurant_spiffos_02_25"] = true,  -- Chair (badBed)
-    ["location_restaurant_spiffos_02_26"] = true,  -- Chair (badBed)
-    ["location_restaurant_spiffos_02_27"] = true,  -- Chair (badBed)
-    ["location_services_beauty_01_0"] = true,  -- Chair (badBed)
-    ["location_services_beauty_01_1"] = true,  -- Chair (badBed)
-    ["location_services_beauty_01_2"] = true,  -- Chair (badBed)
-    ["location_services_beauty_01_3"] = true,  -- Chair (badBed)
-    ["location_shop_mall_01_40"] = true,  -- Chair (badBed)
-    ["location_shop_mall_01_41"] = true,  -- Chair (badBed)
-    ["location_shop_mall_01_42"] = true,  -- Chair (badBed)
-    ["location_shop_mall_01_43"] = true,  -- Chair (badBed)
-    ["recreational_01_10"] = true,  -- Stool (badBed)
-    ["recreational_01_11"] = true,  -- Stool (badBed)
-    ["recreational_01_14"] = true,  -- Stool (badBed)
-    ["recreational_01_15"] = true,  -- Stool (badBed)
-}
-
--- Helper function to get rest type from sprite name
-function BetterResting.getRestTypeFromSprite(spriteName)
-    if not spriteName then return nil end
-    
-    -- Check beds first
-    if BetterResting.BedSprites[spriteName] then
-        return BetterResting.RestType.BED
-    end
-    
-    -- Check chairs
-    if BetterResting.ChairSprites[spriteName] then
-        return BetterResting.RestType.CHAIR
-    end
-    
-    return nil
-end
+local gameTime
+Events.OnGameTimeLoaded.Add(function()
+    gameTime = GameTime.getInstance()
+end)
 
 -- Get current game time in hours
 function BetterResting.getCurrentGameHours()
-    local gameTime = getGameTime()
-    if not gameTime then 
+    if not gameTime then --checker incase api changes
         print("BetterResting [SHARED] ERROR: getGameTime() returned nil!")
         return 0 
     end
-    return gameTime:getWorldAgeHours()
+    return gameTime:getMultiplier()
 end
 
+
 -- Check if player is actually resting (not just standing on furniture)
+-- Uses game's built-in resting detection methods from ISRestAction.lua
 function BetterResting.isPlayerResting(player)
     if not player then return false end
+    -- Use game's built-in resting detection methods (from ISRestAction.lua)
+    -- These methods are set by the game's ISRestAction and other rest actions
     
-    -- Check if player is moving - if moving, they're definitely not resting
-    -- Try multiple methods to detect movement
-    local isMoving = false
-    
-    -- Method 1: Check velocity
-    if player.getVelocity then
-        local vx, vy, vz = player:getVelocity()
-        if vx and vy then
-            local speed = math.sqrt(vx * vx + vy * vy)
-            if speed > 0.01 then  -- If moving faster than threshold
-                isMoving = true
-            end
+    -- Check if player has isResting() method (set by ISRestAction:setIsResting())
+    if player.isResting then
+        local isResting = player:isResting()
+        if isResting then
+            return true
         end
     end
     
-    -- Method 2: Check if player is walking/running
-    if not isMoving and player.isMoving then
-        isMoving = player:isMoving()
-    end
-    
-    -- Method 3: Check movement state variable
-    if not isMoving and player.getVariableBoolean then
-        local isWalking = player:getVariableBoolean("IsWalking")
-        local isRunning = player:getVariableBoolean("IsRunning")
-        if isWalking or isRunning then
-            isMoving = true
+    -- Check if sitting on furniture (chairs, sofas, etc.)
+    if player.isSittingOnFurniture then
+        local isSittingOnFurniture = player:isSittingOnFurniture()
+        if isSittingOnFurniture then
+            return true
         end
     end
     
-    -- If player is moving, they're not resting
-    if isMoving then
-        return false
-    end
-    
-    -- If player is not moving, they might be resting
-    -- Additional check: if they're sitting on ground, they're definitely resting
-    if player.getVariableBoolean then
-        local isSitOnGround = player:getVariableBoolean("IsSitOnGround")
+    -- Check if sitting on ground
+    if player.isSitOnGround then
+        local isSitOnGround = player:isSitOnGround()
         if isSitOnGround then
             return true
         end
     end
     
-    -- If not moving and not explicitly sitting, still allow resting
-    -- (player might be lying in bed or sitting on furniture)
+    -- Check if on bed
+    if player.isOnBed then
+        local isOnBed = player:isOnBed()
+        if isOnBed then
     return true
+        end
+    end
+    
+    return false
 end
 
 -- Detect what type of rest location the player is at
 function BetterResting.detectRestType(player)
     if not player then return BetterResting.RestType.FLOOR end
     
-    -- Check if in vehicle (no movement check needed for vehicles)
+    -- First check: If player is moving, they're not resting - default to floor
+    -- This fixes the bug where sleeping bag state persists after getting up
+    if player.currentSpeed and player.currentSpeed > 0.0 then
+        print("[BetterResting] detectRestType: Player is moving, returning FLOOR")
+        return BetterResting.RestType.FLOOR
+    end
+    
+    -- Also check if player is actually resting using game API
+    local isActuallyResting = false
+    if player.isResting then
+        isActuallyResting = player:isResting()
+    end
+    if not isActuallyResting and player.isSittingOnFurniture then
+        isActuallyResting = player:isSittingOnFurniture()
+    end
+    if not isActuallyResting and player.isSitOnGround then
+        isActuallyResting = player:isSitOnGround()
+    end
+    if not isActuallyResting and player.getBed then
+        isActuallyResting = (player:getBed() ~= nil)
+    end
+    
+    if not isActuallyResting then
+        print("[BetterResting] detectRestType: Player is not actually resting, returning FLOOR")
+        return BetterResting.RestType.FLOOR
+    end
+    
+    -- Priority 1: Check if in vehicle (using game API)
     local vehicle = player:getVehicle()
     if vehicle then
+        print("[BetterResting] detectRestType: VEHICLE detected")
         return BetterResting.RestType.VEHICLE
     end
     
-    -- Check current square for furniture
-    local square = player:getCurrentSquare()
-    if not square then return BetterResting.RestType.FLOOR end
+    -- Priority 2: Check if on bed (using game API from ISRestAction.lua)
+    local isOnBed = false
+    if player.isOnBed then
+        isOnBed = player:isOnBed()
+        print("[BetterResting] detectRestType: isOnBed() = " .. tostring(isOnBed))
+    else
+        print("[BetterResting] detectRestType: isOnBed method not available")
+    end
     
-    local objects = square:getObjects()
-    if not objects then return BetterResting.RestType.FLOOR end
+    if isOnBed then
+        print("[BetterResting] detectRestType: BED detected (via isOnBed)")
+        return BetterResting.RestType.BED
+    end
     
-    -- Track if we've found a chair in this square (to prevent bed detection)
-    local foundChairInSquare = false
-    
-    for i = 0, objects:size() - 1 do
-        local obj = objects:get(i)
-        if obj then
-            -- Try multiple methods to identify the object
-            local customItem = nil
-            local customName = nil
-            local item = nil
-            local objectType = nil
+    -- Check bed object directly (for sleeping bags and other bed types)
+    -- IMPORTANT: Validate that getBed() returns an actual bed, not seating furniture
+    local bed = nil
+    if player.getBed then
+        bed = player:getBed()
+        print("[BetterResting] detectRestType: getBed() = " .. tostring(bed))
+        
+        -- Validate that the bed object is actually a bed, not seating furniture
+        if bed then
+            local isActuallyBed = false
             
-            -- PRIORITY 1: Check CustomItem first (most reliable method)
-            if obj.getCustomItem then
-                customItem = obj:getCustomItem()
+            -- Check sprite name to confirm it's a bed
+            if bed.getSprite then
+                local sprite = bed:getSprite()
+                if sprite then
+                    local spriteName = sprite:getName()
+                    if spriteName then
+                        local spriteNameLower = tostring(spriteName):lower()
+                        print("[BetterResting] detectRestType: bed object sprite: " .. spriteNameLower)
+                        
+                        -- Check if it's seating furniture (should NOT be treated as bed)
+                        if spriteNameLower:find("seating") or 
+                           spriteNameLower:find("chair") or 
+                           spriteNameLower:find("sofa") or 
+                           spriteNameLower:find("couch") or
+                           spriteNameLower:find("stool") or
+                           spriteNameLower:find("bench") or
+                           spriteNameLower:find("seat") then
+                            print("[BetterResting] detectRestType: getBed() returned seating furniture, ignoring")
+                            bed = nil  -- Don't treat as bed
+                        -- Check if it's actually a bed
+                        elseif spriteNameLower:find("bed") or 
+                               spriteNameLower:find("bedding") or 
+                               spriteNameLower:find("sleeping") or
+                               spriteNameLower:find("tent") or
+                               spriteNameLower:find("cot") or
+                               spriteNameLower:find("gurney") or
+                               spriteNameLower:find("camping_") then  -- Check for any camping sprite (tents, sleeping bags, etc.)
+                            isActuallyBed = true
+                            print("[BetterResting] detectRestType: bed object sprite confirms it's a bed")
+                        end
+                    end
+                end
+            end
+            
+            -- If sprite check didn't confirm it's a bed, check CustomItem
+            -- Only check if bed is still valid (not set to nil)
+            if bed and not isActuallyBed and bed.getCustomItem then
+                local customItem = bed:getCustomItem()
+                print("[BetterResting] detectRestType: Checking CustomItem: " .. tostring(customItem))
                 if customItem then
                     local customItemStr = nil
                     if type(customItem) == "string" then
@@ -902,284 +234,140 @@ function BetterResting.detectRestType(player)
                         customItemStr = customItem:getType()
                     elseif customItem.getFullType then
                         customItemStr = customItem:getFullType()
-                    else
-                        customItemStr = tostring(customItem)
                     end
                     
-                    if customItemStr then
-                        -- Check if it's a known bed CustomItem
-                        if BetterResting.BedCustomItems[customItemStr] then
-                            return BetterResting.RestType.BED
-                        end
-                    end
-                end
-            end
-            
-            -- Try getCustomName
-            if obj.getCustomName then
-                customName = obj:getCustomName()
-            end
-            
-            -- Try getItem (for IsoThumpable objects)
-            if obj.getItem then
-                item = obj:getItem()
-            end
-            
-            -- Try getType or getClass
-            if obj.getType then
-                objectType = obj:getType()
-            elseif obj.getClass then
-                objectType = obj:getClass()
-            end
-            
-            -- Get sprite early so we can use it for both chair and bed detection
-            local sprite = obj:getSprite()
-            
-            -- PRIORITY 1.5: Check sprite name lookup table (exact match - very reliable)
-            if sprite then
-                local spriteNameObj = sprite:getName()
-                if spriteNameObj then
-                    local spriteName = tostring(spriteNameObj)
-                    local restTypeFromSprite = BetterResting.getRestTypeFromSprite(spriteName)
-                    if restTypeFromSprite then
-                        if restTypeFromSprite == BetterResting.RestType.CHAIR then
-                            foundChairInSquare = true
-                            if BetterResting.isPlayerResting(player) then
-                                return BetterResting.RestType.CHAIR
-                            else
-                                -- Continue checking other objects, but skip bed detection
-                                bedType = nil
-                            end
-                        elseif restTypeFromSprite == BetterResting.RestType.BED then
-                            return BetterResting.RestType.BED
-                        end
-                    end
-                end
-            end
-            
-            -- PRIORITY 2: Check if object has bed or chair properties (from tiles file)
-            local hasBedProperty = false
-            local hasChairProperty = false
-            local bedType = nil
-            
-            -- Try to get BedType property directly
-            if obj.getProperties then
-                local props = obj:getProperties()
-                if props then
-                    if props:get("bed") then
-                        hasBedProperty = true
-                    end
-                    if props:get("chairS") or props:get("chair") then
-                        hasChairProperty = true
-                    end
-                    if props:get("BedType") then
-                        bedType = props:get("BedType")
-                    end
-                end
-            end
-            
-            -- Also check direct properties
-            if obj.bed then
-                hasBedProperty = true
-            end
-            if obj.chairS or obj.chair then
-                hasChairProperty = true
-            end
-            if obj.BedType then
-                bedType = obj.BedType
-            end
-            
-            
-            -- Check chair properties FIRST (chairs can have BedType but should be treated as chairs)
-            -- Only apply to chairs if player is actually resting (not walking through)
-            -- IMPORTANT: If object has chair property, skip bed detection entirely (chairs can have BedType)
-            local isChairObject = hasChairProperty
-            
-            if hasChairProperty then
-                foundChairInSquare = true  -- Mark that we found a chair in this square
-                if BetterResting.isPlayerResting(player) then
-                    return BetterResting.RestType.CHAIR
-                else
-                    -- Don't check beds if this is a chair (even if moving, it's still a chair)
-                    -- Skip bed detection for this object
-                    hasBedProperty = false  -- Prevent bed detection for chairs
-                    bedType = nil  -- Clear BedType for chairs
-                end
-            end
-            
-            -- Check bed properties (only if not a chair)
-            if hasBedProperty and not isChairObject then
-                return BetterResting.RestType.BED
-            end
-            
-            -- PRIORITY 3: Check CustomName for chairs BEFORE BedType
-            -- This is important because chairs/picnic tables can have BedType=badBed
-            -- but should be treated as chairs based on their CustomName
-            if customName then
-                local nameLower = customName:lower()
-                    if nameLower:find("chair") or 
-                   nameLower:find("stool") or 
-                   nameLower:find("bench") or 
-                   nameLower:find("couch") or 
-                   nameLower:find("sofa") or 
-                   nameLower:find("seat") or 
-                   nameLower:find("table") or 
-                   nameLower:find("picnic") or 
-                   nameLower:find("picknic") or 
-                   nameLower:find("coffin") or 
-                   nameLower:find("ottoman") or 
-                   nameLower:find("pew") then
-                    foundChairInSquare = true  -- Mark that we found a chair in this square
-                    if BetterResting.isPlayerResting(player) then
-                        return BetterResting.RestType.CHAIR
+                    print("[BetterResting] detectRestType: CustomItem string: " .. tostring(customItemStr))
+                    if customItemStr and BetterResting.BedCustomItems[customItemStr] then
+                        isActuallyBed = true
+                        print("[BetterResting] detectRestType: bed object CustomItem confirms it's a bed: " .. tostring(customItemStr))
                     else
-                        -- Continue checking other objects, but skip bed detection
-                        bedType = nil  -- Clear BedType for chairs
+                        print("[BetterResting] detectRestType: CustomItem not in BedCustomItems list")
                     end
                 end
             end
             
-            -- PRIORITY 4: Check sprite name for chairs BEFORE BedType
-            -- Some chairs don't have CustomName but have BedType=badBed
-            -- We need to check sprite names to identify them as chairs
-            if sprite then
-                local spriteNameObj = sprite:getName()
-                if spriteNameObj then
-                    local spriteName = spriteNameObj:lower()
-                    if spriteName then
-                        -- Check for chairs/sofas/couches/seating FIRST (before beds)
-                        if spriteName:find("chair") or 
-                           spriteName:find("chairs") or
-                           spriteName:find("sofa") or 
-                           spriteName:find("couch") or
-                           spriteName:find("seat") or
-                           spriteName:find("furniture_seating") or
-                           spriteName:find("seating") or
-                           spriteName:find("bench") or
-                           spriteName:find("stool") or
-                           spriteName:find("barstool") or
-                           spriteName:find("bar_stool") or
-                           spriteName:find("bar stool") or
-                           spriteName:find("50s_barstool") or
-                           spriteName:find("50s barstool") or
-                           spriteName:find("ottoman") or
-                           spriteName:find("pew") or
-                           spriteName:find("picnic") or
-                           spriteName:find("picknic") or
-                           spriteName:find("picknic_table") or
-                           spriteName:find("picknic table") or
-                           spriteName:find("table") or
-                           spriteName:find("coffin") or
-                           spriteName:find("mat") or
-                           spriteName:find("gymnmat") or
-                           spriteName:find("hay") or
-                           spriteName:find("stacked_hay") or
-                           spriteName:find("stacked hay") or
-                           spriteName:find("shelter") or
-                           spriteName:find("stump") or
-                           spriteName:find("chopping_block") or
-                           spriteName:find("chopping block") then
-                            foundChairInSquare = true  -- Mark that we found a chair in this square
-                            if BetterResting.isPlayerResting(player) then
-                                return BetterResting.RestType.CHAIR
-                            else
-                                -- Continue checking other objects, but skip bed detection
-                                bedType = nil  -- Clear BedType for chairs
+            -- If we couldn't confirm it's a bed, don't treat it as one
+            -- Only set to nil if bed is still valid (not already nil)
+            if bed and not isActuallyBed then
+                print("[BetterResting] detectRestType: getBed() returned object that is not confirmed as bed, ignoring")
+                bed = nil
+                    end
+                end
+            end
+            
+    if bed then
+        print("[BetterResting] detectRestType: BED detected (via getBed)")
+        return BetterResting.RestType.BED
+    end
+    
+    -- Priority 3: Check if sitting on furniture (chairs/sofas using game API from ISRestAction.lua)
+    local isSittingOnFurniture = false
+    if player.isSittingOnFurniture then
+        isSittingOnFurniture = player:isSittingOnFurniture()
+        print("[BetterResting] detectRestType: isSittingOnFurniture() = " .. tostring(isSittingOnFurniture))
+    else
+        print("[BetterResting] detectRestType: isSittingOnFurniture method not available")
+    end
+    
+    if isSittingOnFurniture then
+        -- Check if the furniture object is actually a bed or a chair/sofa
+        local furnitureObj = nil
+        if player.getSitOnFurnitureObject then
+            furnitureObj = player:getSitOnFurnitureObject()
+            print("[BetterResting] detectRestType: getSitOnFurnitureObject() = " .. tostring(furnitureObj))
+            
+            if furnitureObj then
+                local isSeatingFurniture = false
+                local isBedObject = false
+                
+                -- PRIORITY 1: Check sprite name FIRST to identify seating furniture (chairs/sofas/couches)
+                -- This prevents couches from being detected as beds even if they have bed properties
+                if furnitureObj.getSprite then
+                    local sprite = furnitureObj:getSprite()
+                    if sprite then
+                        local spriteName = sprite:getName()
+                        if spriteName then
+                            local spriteNameLower = tostring(spriteName):lower()
+                            print("[BetterResting] detectRestType: furniture sprite name: " .. spriteNameLower)
+                            
+                            -- Check for seating furniture keywords (chairs, sofas, couches, etc.)
+                            if spriteNameLower:find("seating") or 
+                               spriteNameLower:find("chair") or 
+                               spriteNameLower:find("sofa") or 
+                               spriteNameLower:find("couch") or
+                               spriteNameLower:find("stool") or
+                               spriteNameLower:find("bench") or
+                               spriteNameLower:find("seat") then
+                                isSeatingFurniture = true
+                                print("[BetterResting] detectRestType: furniture is seating furniture (chair/sofa/couch)")
+                            -- Check for bed keywords
+                            elseif spriteNameLower:find("bed") or 
+                                   spriteNameLower:find("bedding") or 
+                                   spriteNameLower:find("sleeping") then
+                                isBedObject = true
+                                print("[BetterResting] detectRestType: furniture sprite indicates bed: " .. spriteNameLower)
+                end
+            end
+                    end
+                end
+                
+                -- PRIORITY 2: If not identified by sprite, check CustomItem
+                if not isSeatingFurniture and not isBedObject and furnitureObj.getCustomItem then
+                    local customItem = furnitureObj:getCustomItem()
+                    if customItem then
+                        local customItemStr = nil
+                        if type(customItem) == "string" then
+                            customItemStr = customItem
+                        elseif customItem.getType then
+                            customItemStr = customItem:getType()
+                        elseif customItem.getFullType then
+                            customItemStr = customItem:getFullType()
+                        end
+                        
+                        if customItemStr then
+                            if BetterResting.BedCustomItems[customItemStr] then
+                                isBedObject = true
+                                print("[BetterResting] detectRestType: furniture CustomItem is bed: " .. tostring(customItemStr))
+                        end
+                    end
+                end
+            end
+            
+                -- PRIORITY 3: Only check bed properties if sprite didn't indicate seating furniture
+                -- This prevents couches (which have bed properties) from being detected as beds
+                if not isSeatingFurniture and not isBedObject then
+                    if furnitureObj.getProperties then
+                        local props = furnitureObj:getProperties()
+                        if props then
+                            if props:get("bed") or props:get("BedType") then
+                                isBedObject = true
+                                print("[BetterResting] detectRestType: furniture has bed property")
                             end
                         end
                     end
+                    if furnitureObj.bed or furnitureObj.BedType then
+                        isBedObject = true
+                        print("[BetterResting] detectRestType: furniture has bed property (direct)")
                 end
             end
             
-            -- Check BedType property (but only if it's not a chair)
-            -- Note: Chairs can have BedType=badBed but should be treated as CHAIR, not BED
-            -- We check this AFTER CustomName and sprite name to avoid false positives
-            -- IMPORTANT: If we found a chair in this square, don't check BedType (chairs can have BedType)
-            if bedType and not isChairObject and not foundChairInSquare then
-                return BetterResting.RestType.BED
-            end
-            
-            -- If we have an item, check its type
-            if item then
-                local itemType = nil
-                if item.getType then
-                    itemType = item:getType()
-                elseif item.getFullType then
-                    itemType = item:getFullType()
-                end
-                if itemType then
-                    local itemTypeLower = itemType:lower()
-                    
-                    -- Check for beds
-                    if itemTypeLower:find("sleepingbag") or 
-                       itemTypeLower:find("tent") or 
-                       itemTypeLower:find("cot") or 
-                       itemTypeLower:find("gurney") then
-                        return BetterResting.RestType.BED
-                    end
-                    
-                    -- Check for chairs
-                    if itemTypeLower:find("coffin") or 
-                       itemTypeLower:find("stool") or 
-                       itemTypeLower:find("chair") or 
-                       itemTypeLower:find("bench") or
-                       itemTypeLower:find("table") then
-                        foundChairInSquare = true  -- Mark that we found a chair in this square
-                        if BetterResting.isPlayerResting(player) then
-                            return BetterResting.RestType.CHAIR
-                        else
-                            -- Continue checking other objects, but skip bed detection
-                            bedType = nil  -- Clear BedType for chairs
-                        end
-                    end
-                end
-            end
-            
-            -- CustomItem already checked at PRIORITY 1, skip duplicate check
-            
-            -- Check CustomName for beds (chairs already checked above)
-            if customName then
-                local nameLower = customName:lower()
-                if nameLower:find("bed") or 
-                   nameLower:find("tent") or 
-                   nameLower:find("sleeping") or 
-                   nameLower:find("cot") or 
-                   nameLower:find("gurney") then
+                if isBedObject then
+                    print("[BetterResting] detectRestType: BED detected (furniture is bed)")
                     return BetterResting.RestType.BED
                 end
             end
-            
-            -- Fallback: Check sprite name for beds only (chairs already checked earlier)
-            -- Only check if sprite wasn't already checked above
-            if sprite then
-                local spriteNameObj = sprite:getName()
-                if spriteNameObj then
-                    local spriteName = spriteNameObj:lower()
-                    if spriteName then
-                        -- Check for beds (comprehensive list from game files)
-                        -- Note: camping_02_* sprites are sleeping bags (camping_02_49, camping_02_50, etc.)
-                        if spriteName:find("bed") or 
-                           spriteName:find("furniture_bed") or
-                           spriteName:find("furniture_sleeping") or
-                           spriteName:find("beds") or
-                           spriteName:find("tent") or
-                           spriteName:find("sleeping") or
-                           spriteName:find("sleepingbag") or
-                           spriteName:find("sleeping_bag") or
-                           spriteName:find("sleeping bag") or
-                           spriteName:find("cot") or
-                           spriteName:find("gurney") or
-                           spriteName:find("camping_02_") then
-                            return BetterResting.RestType.BED
-                        end
-                    end
-                end
-            end
         end
+        
+        print("[BetterResting] detectRestType: CHAIR detected (via isSittingOnFurniture)")
+        return BetterResting.RestType.CHAIR
     end
     
+    -- Fallback: Default to floor if none of the above conditions are met
+    print("[BetterResting] detectRestType: FLOOR (fallback)")
     return BetterResting.RestType.FLOOR
 end
+
+
 
 -- Check if we're on the server side (works in both single-player and multiplayer)
 local function isServerSide()
