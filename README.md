@@ -12,7 +12,7 @@ A mod for Project Zomboid Build 42 that enhances resting mechanics, making every
 
 - **Bed Resting**: Beds, sleeping bags, cots, and tents now provide proper healing benefits. Your wounds will heal gradually, muscle strain will ease, and your overall health will improve while you rest.
 
-- **Smart Detection**: The mod intelligently knows when you're actually resting versus just passing through furniture, so you only get benefits when you deserve them.
+- **Smart Detection**: The mod uses the game's built-in API for reliable detection, with comprehensive sprite lookup tables as a fallback. It intelligently knows when you're actually resting versus just passing through furniture, so you only get benefits when you deserve them.
 
 ## Installation
 
@@ -31,6 +31,18 @@ A mod for Project Zomboid Build 42 that enhances resting mechanics, making every
 
 ## How It Works
 
+### Detection System
+The mod uses a multi-layered detection system for maximum reliability:
+1. **Game API Methods**: Primary detection using the game's built-in resting state methods
+2. **Sprite Lookup Tables**: Comprehensive fallback system with 707+ sprite names (264 beds, 443 chairs)
+3. **Movement Detection**: Prevents false positives by checking if the player is actually resting
+
+This ensures accurate detection of:
+- All types of beds (regular beds, sleeping bags, cots, gurneys)
+- All seating furniture (chairs, sofas, couches, stools, benches, picnic tables)
+- Tents and camping equipment
+- Vehicles
+
 ### Chair/Sofa Resting
 - Rest on any chair, sofa, stool, bench, or seating furniture
 - Stamina recovers 7% faster than normal
@@ -43,7 +55,7 @@ A mod for Project Zomboid Build 42 that enhances resting mechanics, making every
 - Perfect for quick recovery during long drives
 
 ### Bed Resting
-- Rest in any bed, sleeping bag, cot, or tent
+- Rest in any bed, sleeping bag, cot, tent, or bed-like furniture
 - Stamina recovers 20% faster than normal
 - Wounds heal gradually over time
 - Muscle strain (stiffness) recovers 30% faster
@@ -53,6 +65,13 @@ A mod for Project Zomboid Build 42 that enhances resting mechanics, making every
 
 - Project Zomboid Build 42 or later
 - No other mods required
+
+## Technical Details
+
+- Uses Project Zomboid's built-in API methods (`isResting()`, `isSittingOnFurniture()`, `isOnBed()`, etc.)
+- Comprehensive sprite lookup tables for edge cases and maximum compatibility
+- Server-side game mechanics with client-side UI feedback
+- Movement detection prevents false positives when walking through furniture
 
 ## Compatibility
 
