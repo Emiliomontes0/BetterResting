@@ -428,16 +428,19 @@ end
 
 -- Check if we're on the server side (works in both single-player and multiplayer)
 local function isServerSide()
-    if isServer then
-        return isServer()
+    local result = false
+    if isServer and type(isServer) == "function" then
+        result = isServer()
+        print(string.format("[BetterResting SHARED] isServer() check: %s", tostring(result)))
+    elseif isClient and type(isClient) == "function" then
+        result = not isClient()
+        print(string.format("[BetterResting SHARED] isClient() check: %s, so server side: %s", tostring(isClient()), tostring(result)))
+    else
+        -- Default: assume server (for single-player compatibility)
+        result = true
+        print("[BetterResting SHARED] No isServer/isClient functions, assuming server side")
     end
-    -- In single-player, client = server, so return true
-    -- In multiplayer client, return false
-    if isClient then
-        return not isClient()
-    end
-    -- Default: assume server (for single-player compatibility)
-    return true
+    return result
 end
 
 -- Track player states (game mechanics) - server authoritative
@@ -650,10 +653,17 @@ local function processBedResting(player, data, updateCounter)
                                     
                                     part:setStiffness(newStiffness)
                                     
+                                    -- Immediately verify and log
                                     local verifyStiffness = part:getStiffness()
                                     if math.abs(verifyStiffness - newStiffness) > 0.01 then
-                                        print(string.format("[BetterResting SHARED] WARNING: Stiffness mismatch! Set %.2f but got %.2f", 
-                                            newStiffness, verifyStiffness))
+                                        print(string.format("[BetterResting SHARED] WARNING: Stiffness mismatch! Set %.2f but got %.2f (diff: %.2f)", 
+                                            newStiffness, verifyStiffness, verifyStiffness - newStiffness))
+                                        -- Try setting again
+                                        part:setStiffness(newStiffness)
+                                        local verify2 = part:getStiffness()
+                                        if math.abs(verify2 - newStiffness) > 0.01 then
+                                            print(string.format("[BetterResting SHARED] CRITICAL: Stiffness still wrong after retry! Something is resetting it!"))
+                                        end
                                     end
                                     
                                     previousValues[partKeyStiff] = newStiffness
@@ -715,15 +725,26 @@ local hasLoggedStart = false
 Events.OnPlayerUpdate.Add(function(player)
     if not player then return end
     
+    -- Check if we're on server side
+    local onServer = isServerSide()
+    
+    -- Log first time to confirm detection
+    if not hasLoggedStart then
+        print(string.format("[BetterResting SHARED] OnPlayerUpdate handler - isServerSide: %s", tostring(onServer)))
+        hasLoggedStart = true
+    end
+    
     -- Only run game mechanics on server side
-    if not isServerSide() then
+    if not onServer then
+        if updateCounter == 0 then
+            print("[BetterResting SHARED] WARNING: OnPlayerUpdate running on CLIENT side - game mechanics disabled!")
+        end
         return
     end
     
-    -- Log first time to confirm it's running
-    if not hasLoggedStart then
+    -- Log first time to confirm it's running on server
+    if updateCounter == 0 then
         print("[BetterResting SHARED] OnPlayerUpdate handler is ACTIVE on server side!")
-        hasLoggedStart = true
     end
     
     updateCounter = updateCounter + 1

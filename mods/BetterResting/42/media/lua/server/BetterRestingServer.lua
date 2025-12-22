@@ -375,9 +375,13 @@ local function processBedResting(player, data, updateCounter)
 end
 
 -- Main server update loop - handles game mechanics
+-- DISABLED: All game mechanics moved to shared script (BetterRestingShared.lua)
+-- This script is kept for reference but no longer processes game mechanics
 local updateCounter = 0
-print("[BetterResting SERVER] Registering OnPlayerUpdate event handler...")
+print("[BetterResting SERVER] Server script loaded (game mechanics disabled - using shared script instead)")
 
+-- DISABLED: Game mechanics now handled in shared script
+--[[
 Events.OnPlayerUpdate.Add(function(player)
     if not player then 
         print("[BetterResting SERVER] WARNING: OnPlayerUpdate called with nil player!")
@@ -401,8 +405,14 @@ Events.OnPlayerUpdate.Add(function(player)
     
     -- Log first few updates to confirm it's running
     if updateCounter <= 10 then
-        print(string.format("[BetterResting SERVER] OnPlayerUpdate tick %d for player %s (isServer: %s)", 
-            updateCounter, player:getUsername() or "unknown", tostring(isServerSide())))
+        local serverCheck = "unknown"
+        if isServer then
+            serverCheck = tostring(isServer())
+        elseif isClient then
+            serverCheck = "not client"
+        end
+        print(string.format("[BetterResting SERVER] OnPlayerUpdate tick %d for player %s (server check: %s)", 
+            updateCounter, player:getUsername() or "unknown", serverCheck))
     end
     
     -- Initialize player data
@@ -463,6 +473,7 @@ Events.OnPlayerUpdate.Add(function(player)
         end
     end
 end)
+--]]
 
 -- Force print to console immediately
 print("=========================================")
