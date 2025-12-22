@@ -1,10 +1,6 @@
 -- BetterResting Shared Script
 -- Configuration accessible by both client and server
 
-import{
-    ISOGameCharacter
-}
-
 BetterResting = BetterResting or {}
 BetterResting.Version = "1.1"
 BetterResting.ModID = "BetterResting"
@@ -121,7 +117,7 @@ function BetterResting.isPlayerResting(player)
     if player.isOnBed then
         local isOnBed = player:isOnBed()
         if isOnBed then
-            return true
+    return true
         end
     end
     
@@ -132,29 +128,242 @@ end
 function BetterResting.detectRestType(player)
     if not player then return BetterResting.RestType.FLOOR end
     
+    -- First check: If player is moving, they're not resting - default to floor
+    -- This fixes the bug where sleeping bag state persists after getting up
+    if player.currentSpeed and player.currentSpeed > 0.0 then
+        print("[BetterResting] detectRestType: Player is moving, returning FLOOR")
+        return BetterResting.RestType.FLOOR
+    end
+    
+    -- Also check if player is actually resting using game API
+    local isActuallyResting = false
+    if player.isResting then
+        isActuallyResting = player:isResting()
+    end
+    if not isActuallyResting and player.isSittingOnFurniture then
+        isActuallyResting = player:isSittingOnFurniture()
+    end
+    if not isActuallyResting and player.isSitOnGround then
+        isActuallyResting = player:isSitOnGround()
+    end
+    if not isActuallyResting and player.getBed then
+        isActuallyResting = (player:getBed() ~= nil)
+    end
+    
+    if not isActuallyResting then
+        print("[BetterResting] detectRestType: Player is not actually resting, returning FLOOR")
+        return BetterResting.RestType.FLOOR
+    end
+    
     -- Priority 1: Check if in vehicle (using game API)
     local vehicle = player:getVehicle()
     if vehicle then
+        print("[BetterResting] detectRestType: VEHICLE detected")
         return BetterResting.RestType.VEHICLE
     end
     
     -- Priority 2: Check if on bed (using game API from ISRestAction.lua)
+    local isOnBed = false
     if player.isOnBed then
-        local isOnBed = player:isOnBed()
-        if isOnBed then
-            return BetterResting.RestType.BED
-        end
+        isOnBed = player:isOnBed()
+        print("[BetterResting] detectRestType: isOnBed() = " .. tostring(isOnBed))
+    else
+        print("[BetterResting] detectRestType: isOnBed method not available")
+    end
+    
+    if isOnBed then
+        print("[BetterResting] detectRestType: BED detected (via isOnBed)")
+        return BetterResting.RestType.BED
+    end
+    
+    -- Check bed object directly (for sleeping bags and other bed types)
+    -- IMPORTANT: Validate that getBed() returns an actual bed, not seating furniture
+    local bed = nil
+    if player.getBed then
+        bed = player:getBed()
+        print("[BetterResting] detectRestType: getBed() = " .. tostring(bed))
+        
+        -- Validate that the bed object is actually a bed, not seating furniture
+        if bed then
+            local isActuallyBed = false
+            
+            -- Check sprite name to confirm it's a bed
+            if bed.getSprite then
+                local sprite = bed:getSprite()
+                if sprite then
+                    local spriteName = sprite:getName()
+                    if spriteName then
+                        local spriteNameLower = tostring(spriteName):lower()
+                        print("[BetterResting] detectRestType: bed object sprite: " .. spriteNameLower)
+                        
+                        -- Check if it's seating furniture (should NOT be treated as bed)
+                        if spriteNameLower:find("seating") or 
+                           spriteNameLower:find("chair") or 
+                           spriteNameLower:find("sofa") or 
+                           spriteNameLower:find("couch") or
+                           spriteNameLower:find("stool") or
+                           spriteNameLower:find("bench") or
+                           spriteNameLower:find("seat") then
+                            print("[BetterResting] detectRestType: getBed() returned seating furniture, ignoring")
+                            bed = nil  -- Don't treat as bed
+                        -- Check if it's actually a bed
+                        elseif spriteNameLower:find("bed") or 
+                               spriteNameLower:find("bedding") or 
+                               spriteNameLower:find("sleeping") or
+                               spriteNameLower:find("tent") or
+                               spriteNameLower:find("cot") or
+                               spriteNameLower:find("gurney") or
+                               spriteNameLower:find("camping_") then  -- Check for any camping sprite (tents, sleeping bags, etc.)
+                            isActuallyBed = true
+                            print("[BetterResting] detectRestType: bed object sprite confirms it's a bed")
+                        end
+                    end
+                end
+            end
+            
+            -- If sprite check didn't confirm it's a bed, check CustomItem
+            -- Only check if bed is still valid (not set to nil)
+            if bed and not isActuallyBed and bed.getCustomItem then
+                local customItem = bed:getCustomItem()
+                print("[BetterResting] detectRestType: Checking CustomItem: " .. tostring(customItem))
+                if customItem then
+                    local customItemStr = nil
+                    if type(customItem) == "string" then
+                        customItemStr = customItem
+                    elseif customItem.getType then
+                        customItemStr = customItem:getType()
+                    elseif customItem.getFullType then
+                        customItemStr = customItem:getFullType()
+                    end
+                    
+                    print("[BetterResting] detectRestType: CustomItem string: " .. tostring(customItemStr))
+                    if customItemStr and BetterResting.BedCustomItems[customItemStr] then
+                        isActuallyBed = true
+                        print("[BetterResting] detectRestType: bed object CustomItem confirms it's a bed: " .. tostring(customItemStr))
+                    else
+                        print("[BetterResting] detectRestType: CustomItem not in BedCustomItems list")
+                    end
+                end
+            end
+            
+            -- If we couldn't confirm it's a bed, don't treat it as one
+            -- Only set to nil if bed is still valid (not already nil)
+            if bed and not isActuallyBed then
+                print("[BetterResting] detectRestType: getBed() returned object that is not confirmed as bed, ignoring")
+                bed = nil
+                    end
+                end
+            end
+            
+    if bed then
+        print("[BetterResting] detectRestType: BED detected (via getBed)")
+        return BetterResting.RestType.BED
     end
     
     -- Priority 3: Check if sitting on furniture (chairs/sofas using game API from ISRestAction.lua)
+    local isSittingOnFurniture = false
     if player.isSittingOnFurniture then
-        local isSittingOnFurniture = player:isSittingOnFurniture()
-        if isSittingOnFurniture then
-            return BetterResting.RestType.CHAIR
+        isSittingOnFurniture = player:isSittingOnFurniture()
+        print("[BetterResting] detectRestType: isSittingOnFurniture() = " .. tostring(isSittingOnFurniture))
+    else
+        print("[BetterResting] detectRestType: isSittingOnFurniture method not available")
+    end
+    
+    if isSittingOnFurniture then
+        -- Check if the furniture object is actually a bed or a chair/sofa
+        local furnitureObj = nil
+        if player.getSitOnFurnitureObject then
+            furnitureObj = player:getSitOnFurnitureObject()
+            print("[BetterResting] detectRestType: getSitOnFurnitureObject() = " .. tostring(furnitureObj))
+            
+            if furnitureObj then
+                local isSeatingFurniture = false
+                local isBedObject = false
+                
+                -- PRIORITY 1: Check sprite name FIRST to identify seating furniture (chairs/sofas/couches)
+                -- This prevents couches from being detected as beds even if they have bed properties
+                if furnitureObj.getSprite then
+                    local sprite = furnitureObj:getSprite()
+                    if sprite then
+                        local spriteName = sprite:getName()
+                        if spriteName then
+                            local spriteNameLower = tostring(spriteName):lower()
+                            print("[BetterResting] detectRestType: furniture sprite name: " .. spriteNameLower)
+                            
+                            -- Check for seating furniture keywords (chairs, sofas, couches, etc.)
+                            if spriteNameLower:find("seating") or 
+                               spriteNameLower:find("chair") or 
+                               spriteNameLower:find("sofa") or 
+                               spriteNameLower:find("couch") or
+                               spriteNameLower:find("stool") or
+                               spriteNameLower:find("bench") or
+                               spriteNameLower:find("seat") then
+                                isSeatingFurniture = true
+                                print("[BetterResting] detectRestType: furniture is seating furniture (chair/sofa/couch)")
+                            -- Check for bed keywords
+                            elseif spriteNameLower:find("bed") or 
+                                   spriteNameLower:find("bedding") or 
+                                   spriteNameLower:find("sleeping") then
+                                isBedObject = true
+                                print("[BetterResting] detectRestType: furniture sprite indicates bed: " .. spriteNameLower)
+                end
+            end
+                    end
+                end
+                
+                -- PRIORITY 2: If not identified by sprite, check CustomItem
+                if not isSeatingFurniture and not isBedObject and furnitureObj.getCustomItem then
+                    local customItem = furnitureObj:getCustomItem()
+                    if customItem then
+                        local customItemStr = nil
+                        if type(customItem) == "string" then
+                            customItemStr = customItem
+                        elseif customItem.getType then
+                            customItemStr = customItem:getType()
+                        elseif customItem.getFullType then
+                            customItemStr = customItem:getFullType()
+                        end
+                        
+                        if customItemStr then
+                            if BetterResting.BedCustomItems[customItemStr] then
+                                isBedObject = true
+                                print("[BetterResting] detectRestType: furniture CustomItem is bed: " .. tostring(customItemStr))
+                        end
+                    end
+                end
+            end
+            
+                -- PRIORITY 3: Only check bed properties if sprite didn't indicate seating furniture
+                -- This prevents couches (which have bed properties) from being detected as beds
+                if not isSeatingFurniture and not isBedObject then
+                    if furnitureObj.getProperties then
+                        local props = furnitureObj:getProperties()
+                        if props then
+                            if props:get("bed") or props:get("BedType") then
+                                isBedObject = true
+                                print("[BetterResting] detectRestType: furniture has bed property")
+                            end
+                        end
+                    end
+                    if furnitureObj.bed or furnitureObj.BedType then
+                        isBedObject = true
+                        print("[BetterResting] detectRestType: furniture has bed property (direct)")
+                end
+            end
+            
+                if isBedObject then
+                    print("[BetterResting] detectRestType: BED detected (furniture is bed)")
+                    return BetterResting.RestType.BED
+                end
+            end
         end
+        
+        print("[BetterResting] detectRestType: CHAIR detected (via isSittingOnFurniture)")
+        return BetterResting.RestType.CHAIR
     end
     
     -- Fallback: Default to floor if none of the above conditions are met
+    print("[BetterResting] detectRestType: FLOOR (fallback)")
     return BetterResting.RestType.FLOOR
 end
 
