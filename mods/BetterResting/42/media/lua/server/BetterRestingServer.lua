@@ -130,7 +130,7 @@ local previousValues = {}
 
 -- Process bed resting bonuses
 local function processBedResting(player, data, updateCounter)
-    print(string.format("[BetterResting SERVER] processBedResting called (tick %d)", updateCounter))
+    -- print(string.format("[BetterResting SERVER] processBedResting called (tick %d)", updateCounter))
     local bodyDamage = player:getBodyDamage()
     if not bodyDamage then 
         print("[BetterResting SERVER] WARNING: bodyDamage is nil!")
@@ -138,7 +138,7 @@ local function processBedResting(player, data, updateCounter)
     end
     
     local playerKey = tostring(player:getPlayerNum())
-    print(string.format("[BetterResting SERVER] Processing bed resting for player %s", playerKey))
+    -- print(string.format("[BetterResting SERVER] Processing bed resting for player %s", playerKey))
     
     -- Enhanced stamina regen while in bed
     local stats = player:getStats()
@@ -294,10 +294,12 @@ local function processBedResting(player, data, updateCounter)
                                     local partKey = playerKey .. "_part" .. i .. "_stiffness"
                                     local previousStiffness = previousValues[partKey]
                                     
-                                    -- Check if value was unexpectedly changed by something else
+                                    -- Check if value was unexpectedly changed by something else (game engine may modify it)
                                     if previousStiffness and math.abs(stiffness - previousStiffness) > 0.5 then
                                         print(string.format("[BetterResting SERVER] WARNING: Stiffness changed unexpectedly! Expected ~%.2f but got %.2f (diff: %.2f)", 
                                             previousStiffness, stiffness, stiffness - previousStiffness))
+                                        -- Update our tracking to match the actual current value (game engine modified it)
+                                        -- We'll work with the current value instead of fighting the game engine
                                     end
                                     
                                     local reduction = 0.005 * BetterResting.Config.BedMuscleFatigueReduction * 100
@@ -314,10 +316,14 @@ local function processBedResting(player, data, updateCounter)
                                     if math.abs(verifyStiffness - newStiffness) > 0.01 then
                                         print(string.format("[BetterResting SERVER] WARNING: Stiffness mismatch! Set %.2f but got %.2f", 
                                             newStiffness, verifyStiffness))
+                                        -- If the game engine immediately modified it, update our tracking to the actual value
+                                        -- This prevents us from fighting against the game's own systems
+                                        -- Always use the actual verified value for tracking
+                                        previousValues[partKey] = verifyStiffness
+                                    else
+                                        -- Store the value we successfully set
+                                        previousValues[partKey] = newStiffness
                                     end
-                                    
-                                    -- Store for next check
-                                    previousValues[partKey] = newStiffness
                                     
                                     -- If stiffness reaches 0, remove it from fitness system
                                     if newStiffness <= 0 and player.getFitness then
@@ -375,32 +381,30 @@ local function processBedResting(player, data, updateCounter)
 end
 
 -- Main server update loop - handles game mechanics
--- DISABLED: All game mechanics moved to shared script (BetterRestingShared.lua)
--- This script is kept for reference but no longer processes game mechanics
+-- Server-side authoritative execution ensures changes persist and sync properly
 local updateCounter = 0
-print("[BetterResting SERVER] Server script loaded (game mechanics disabled - using shared script instead)")
+print("[BetterResting SERVER] Server script loaded - Game mechanics ENABLED on server side")
 
--- DISABLED: Game mechanics now handled in shared script
---[[
+-- Server-side authoritative game mechanics handler
 Events.OnPlayerUpdate.Add(function(player)
     if not player then 
         print("[BetterResting SERVER] WARNING: OnPlayerUpdate called with nil player!")
         return 
     end
     
-    -- In Build 42, server scripts in server/ directory should only load on server
-    -- But let's log to confirm
+    -- Verify we're on server side (scripts in server/ directory should only load on server in multiplayer)
+    -- In single-player, this still runs as the server
     if updateCounter == 0 then
         local serverCheck = "unknown"
-        if isServer then
+        if isServer and type(isServer) == "function" then
             serverCheck = tostring(isServer())
-        elseif isClient then
-            serverCheck = "not client (probably server)"
+        elseif isClient and type(isClient) == "function" then
+            serverCheck = "not client (server)"
         end
-        print(string.format("[BetterResting SERVER] OnPlayerUpdate first call - isServer check: %s", serverCheck))
+        print(string.format("[BetterResting SERVER] OnPlayerUpdate first call - Server authoritative mode active (check: %s)", serverCheck))
     end
     
-    -- Server script runs on server (in multiplayer) and in single-player (where client = server)
+    -- Server-side authoritative execution - changes made here persist and sync to clients
     updateCounter = updateCounter + 1
     
     -- Log first few updates to confirm it's running
@@ -420,10 +424,10 @@ Events.OnPlayerUpdate.Add(function(player)
     local restType = BetterResting.detectRestType(player)
 
     -- Log rest type detection (aggressive logging for debugging)
-    if updateCounter <= 20 or restType == BetterResting.RestType.BED or data.lastRestType ~= restType then
-        print(string.format("[BetterResting SERVER] Player %s: restType=%s, lastRestType=%s (tick %d)", 
-            player:getUsername() or "unknown", restType or "nil", data.lastRestType or "nil", updateCounter))
-    end
+    -- if updateCounter <= 20 or restType == BetterResting.RestType.BED or data.lastRestType ~= restType then
+    --     print(string.format("[BetterResting SERVER] Player %s: restType=%s, lastRestType=%s (tick %d)", 
+    --         player:getUsername() or "unknown", restType or "nil", data.lastRestType or "nil", updateCounter))
+    -- end
 
     -- Track rest type changes
     if data.lastRestType ~= restType then
@@ -453,8 +457,8 @@ Events.OnPlayerUpdate.Add(function(player)
         processVehicleResting(player, data, updateCounter)
     elseif restType == BetterResting.RestType.BED then
         -- Log EVERY tick when in bed for debugging
-        print(string.format("[BetterResting SERVER] Processing BED resting for player %s (tick %d)", 
-            player:getUsername() or "unknown", updateCounter))
+        -- print(string.format("[BetterResting SERVER] Processing BED resting for player %s (tick %d)", 
+        --     player:getUsername() or "unknown", updateCounter))
         processBedResting(player, data, updateCounter)
     elseif updateCounter % 300 == 0 then -- Log every 5 seconds when not resting
         print(string.format("[BetterResting SERVER] Player %s rest type: %s (tick %d)", 
@@ -473,11 +477,11 @@ Events.OnPlayerUpdate.Add(function(player)
         end
     end
 end)
---]]
 
 -- Force print to console immediately
 print("=========================================")
 print("[BetterResting SERVER] Server script loaded and initialized")
+print("[BetterResting SERVER] GAME MECHANICS ACTIVE - Server authoritative mode")
 print("=========================================")
 
 -- Also try writeLog if available
