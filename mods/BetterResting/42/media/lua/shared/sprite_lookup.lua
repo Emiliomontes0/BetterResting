@@ -729,6 +729,37 @@ BetterResting.ChairSprites = {
     ["recreational_01_15"] = true,  -- Stool (badBed)
 }
 
+BetterResting.BedCustomItems = {
+    -- Tents
+    ["Base.CampingTentKit2"] = true,
+    ["Base.HideTent"] = true,
+    ["Base.ImprovisedTentKit"] = true,
+    ["Base.TentBlue"] = true,
+    ["Base.TentBrown"] = true,
+    ["Base.TentGreen"] = true,
+    ["Base.TentYellow"] = true,
+    -- Sleeping Bags
+    ["Base.SleepingBag_BluePlaid"] = true,
+    ["Base.SleepingBag_Camo"] = true,
+    ["Base.SleepingBag_Cheap_Blue"] = true,
+    ["Base.SleepingBag_Cheap_Green"] = true,
+    ["Base.SleepingBag_Cheap_Green2"] = true,
+    ["Base.SleepingBag_Green"] = true,
+    ["Base.SleepingBag_GreenPlaid"] = true,
+    ["Base.SleepingBag_Hide"] = true,
+    ["Base.SleepingBag_HighQuality_Brown"] = true,
+    ["Base.SleepingBag_RedPlaid"] = true,
+    ["Base.SleepingBag_Spiffo"] = true,
+    -- Beds and Cots
+    ["Base.Mov_Cot"] = true,
+    ["Base.Mov_Gurney"] = true,
+    ["Mov_Gurney"] = true,  -- Some variants don't have Base. prefix
+    -- Other bed-like objects
+    ["Base.Mov_GymnMat"] = true,
+    -- Coffins (treated as beds for resting)
+    ["Base.Mov_FlatCoffin"] = true,
+}
+
 -- Combined lookup function
 -- Returns 'BED', 'CHAIR', or nil
 function BetterResting.getRestTypeFromSprite(spriteName)

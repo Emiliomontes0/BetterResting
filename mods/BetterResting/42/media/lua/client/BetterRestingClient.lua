@@ -185,16 +185,6 @@ if writeLog then
     writeLog("BetterResting", "Client script loaded")
 end
 
--- Show confirmation message when mod loads
-local function showModConfirmation()
-    local player = getPlayer()
-    if player and not hasShownInitialMessage then
-        -- Show a clear confirmation message (green: 0, 255, 0)
-        HaloTextHelper.addTextWithArrow(player, "BetterResting Mod Loaded!", true, 0, 255, 0)
-        hasShownInitialMessage = true
-    end
-end
-
 -- Initialize and show confirmation on game start
 local function initBetterResting()
     local player = getPlayer()
