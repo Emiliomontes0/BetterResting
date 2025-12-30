@@ -312,3 +312,99 @@ function BetterResting.detectRestType(player)
     -- Final fallback
     return BetterResting.RestType.NOT_RESTING
 end
+
+-- Base class for stiffness data management (following Build 42 pattern)
+StiffnessData = {}
+StiffnessData.__index = StiffnessData
+
+function StiffnessData:new(player)
+    local o = {}
+    setmetatable(o, self)
+    self.__index = self
+    
+    o.player = player
+    o.playerNum = player:getPlayerNum()
+    o.bodyParts = {}
+    o.tolerance = 0.01
+    
+    return o
+end
+
+function StiffnessData:getPlayer()
+    return self.player
+end
+
+function StiffnessData:getPlayerNum()
+    return self.playerNum
+end
+
+-- Derived class for bed resting stiffness management
+BedStiffnessAction = {}
+BedStiffnessAction.__index = BedStiffnessAction
+setmetatable(BedStiffnessAction, {__index = StiffnessData})
+
+function BedStiffnessAction:new(player, updateCounter)
+    local o = StiffnessData.new(StiffnessData, player)
+    setmetatable(o, self)
+    self.__index = self
+    
+    o.updateCounter = updateCounter
+    o.reductionRate = 0.002 * BetterResting.Config.BedMuscleFatigueReduction * 100
+    o.bodyPartsModified = false
+    
+    return o
+end
+
+function BedStiffnessAction:processStiffness(bodyPart, partIndex, expectedStiffness)
+    if not bodyPart or not bodyPart.getStiffness or not bodyPart.setStiffness then
+        return nil
+    end
+    
+    local stiffness = bodyPart:getStiffness()
+    local partKey = tostring(self.playerNum) .. "_" .. tostring(partIndex)
+    
+    if not stiffness or stiffness <= 0 then
+        -- Stiffness is 0, clear expected value
+        expectedStiffness[partKey] = nil
+        return nil
+    end
+    
+    local expectedValue = expectedStiffness[partKey]
+    
+    local newStiffness
+    if expectedValue then
+        -- Continue reducing from expected value
+        newStiffness = math.max(0, expectedValue - self.reductionRate)
+    else
+        -- First time seeing this part, start from current value
+        newStiffness = math.max(0, stiffness - self.reductionRate)
+    end
+    
+    -- Update expected value (or clear if it reached 0)
+    if newStiffness <= 0 then
+        expectedStiffness[partKey] = nil
+    else
+        expectedStiffness[partKey] = newStiffness
+    end
+    
+    -- Check if current value matches expected (within tolerance)
+    if math.abs(stiffness - newStiffness) > self.tolerance then
+        -- Value doesn't match - enforce our expected value
+        bodyPart:setStiffness(newStiffness)
+        self.bodyPartsModified = true
+        return newStiffness
+    end
+    
+    return newStiffness
+end
+
+function BedStiffnessAction:syncBodyDamage(bodyDamage)
+    if self.bodyPartsModified and isServer() then
+        if bodyDamage and bodyDamage.sync then
+            bodyDamage:sync()
+        end
+        if self.player and self.player.transmitBodyDamage then
+            self.player:transmitBodyDamage()
+        end
+    end
+end
