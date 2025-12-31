@@ -313,7 +313,6 @@ function BetterResting.detectRestType(player)
     return BetterResting.RestType.NOT_RESTING
 end
 
--- Base class for stiffness data management (following Build 42 pattern)
 StiffnessData = {}
 StiffnessData.__index = StiffnessData
 
@@ -400,11 +399,86 @@ end
 
 function BedStiffnessAction:syncBodyDamage(bodyDamage)
     if self.bodyPartsModified and isServer() then
-        if bodyDamage and bodyDamage.sync then
-            bodyDamage:sync()
-        end
-        if self.player and self.player.transmitBodyDamage then
-            self.player:transmitBodyDamage()
+        if bodyDamage and bodyDamage.Update then
+            bodyDamage:Update()
         end
     end
+end
+
+
+
+-- Bed resting stiffness handler
+-- Guard to prevent overwriting if loaded multiple times
+bedRestingStiffness = bedRestingStiffness or {}
+bedRestingStiffness.__index = bedRestingStiffness
+
+--- Creates a new bed resting stiffness handler and processes stiffness reduction
+--- @param character IsoPlayer The player character object
+--- @return table|nil The stiffness handler instance, or nil if not resting on bed
+function bedRestingStiffness:new(character)
+    if not character then
+        return nil
+    end
+    
+    -- Check if player is resting on a bed
+    local restType = BetterResting.detectRestType(character)
+    if restType ~= BetterResting.RestType.BED then
+        return nil  -- Not resting on bed, don't process
+    end
+    
+    -- Create instance
+    local o = {}
+    setmetatable(o, self)
+    self.__index = self
+    
+    o.character = character
+    o.bodyPartsModified = false
+    
+    -- Process stiffness reduction
+    local bodyDamage = character:getBodyDamage()
+    if not bodyDamage then
+        return nil
+    end
+    
+    local bodyParts = bodyDamage:getBodyParts()
+    if bodyParts then
+        for i = 0, bodyParts:size() - 1 do
+            local bodyPart = bodyParts:get(i)
+            if bodyPart and bodyPart.getStiffness and bodyPart.setStiffness then
+                local stiffness = bodyPart:getStiffness()
+                if stiffness and stiffness > 0 then
+                    -- Calculate reduction per tick
+                    local reduction = 0.002 * BetterResting.Config.BedMuscleFatigueReduction * 100
+                    local newStiffness = math.max(0, stiffness - reduction)
+                    
+                    -- setStiffness doesn't return a value - it's a void function
+                    bodyPart:setStiffness(newStiffness)
+                    o.bodyPartsModified = true
+                end
+            end
+        end
+        
+        -- Sync body damage changes (server-side)
+        -- bodyDamage:Update() should handle syncing to clients
+        if o.bodyPartsModified and isServer() then
+            if bodyDamage.Update then
+                bodyDamage:Update()
+            end
+        end
+    end
+    
+    return o
+end
+
+-- Client-side: Send command to server when resting on bed
+-- NOTE: Only in multiplayer - in single player, server processes directly via OnPlayerUpdate
+if isClient() and not isServer() then
+    Events.OnPlayerUpdate.Add(function(player)
+        if not player then return end
+        
+        local restType = BetterResting.detectRestType(player)
+        if restType == BetterResting.RestType.BED then
+            sendClientCommand(player, "BetterResting", "ReduceStiffness", {})
+        end
+    end)
 end
