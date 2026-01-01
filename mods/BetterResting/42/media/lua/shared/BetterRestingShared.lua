@@ -1,29 +1,33 @@
+-- BetterResting Shared Script
+-- Configuration accessible by both client and server
+
 BetterResting = BetterResting or {}
 BetterResting.Version = "1.1"
 BetterResting.ModID = "BetterResting"
+BetterResting.ModName = "BetterResting"
 
-BetterResting.ClientBuffData = BetterResting.ClientBuffData or {
-    chairBuffActive = false,
-    chairBuffEndTime = 0,
-}
-
+-- Configuration values
 BetterResting.Config = {
-    ChairStaminaRegenMultiplier = 1.07,
-    ChairBuffDuration = 600,
-    ChairStaminaConsumptionReduction = 0.75,
+    -- Chair/Sofa bonuses
+    ChairStaminaRegenMultiplier = 1.07,       -- 7% faster stamina regen on chairs
+    ChairBuffDuration = 600,                  -- 10 minutes = 600 seconds (game time)
+    ChairStaminaConsumptionReduction = 0.75,  -- 25% reduction when buff active
     MinChairRestTime = 0.1,
     MinBuffDuration = 0.1,
     MaxBuffDuration = 1.0,
     
-    VehicleStaminaRegenMultiplier = 1.10,
-    VehicleStaminaConsumptionReduction = 0.5,
+    -- Vehicle bonuses
+    VehicleStaminaRegenMultiplier = 1.10,     -- 10% faster stamina regen in vehicle
+    VehicleStaminaConsumptionReduction = 0.5, -- 50% reduction while in vehicle
     
-    BedStaminaRegenMultiplier = 1.2,
-    BedHPRegenMultiplier = 2.0,
-    BedMuscleFatigueReduction = 0.30,
-    BedWoundHealingMultiplier = 2.0,
+    -- Bed bonuses
+    BedStaminaRegenMultiplier = 1.2,          -- 20% faster stamina regen in bed
+    BedHPRegenMultiplier = 2.0,               -- 2x faster HP regen (gradual healing)
+    BedMuscleFatigueReduction = 0.30,         -- 30% faster muscle fatigue recovery (increased from 15%)
+
 }
 
+-- Rest location types
 BetterResting.RestType = {
     FLOOR = "floor",
     CHAIR = "chair",
@@ -32,22 +36,66 @@ BetterResting.RestType = {
     NOT_RESTING = "not_resting"
 }
 
+function BetterResting:buildOptions()
+    local options = PZAPI.ModOptions:create(self.ModID, self.ModName)  
+    
+    -- Chair/Sofa bonuses
+    self.Config.ChairStaminaRegenMultiplier = options:addSlider("ChairStaminaRegenMultiplier", "Chair Stamina Regen Multiplier", 0.5, 3.0, 0.01, 1.07)
+    self.Config.ChairBuffDuration = options:addSlider("ChairBuffDuration", "Chair Buff Duration", 60, 3600, 60, 600)  
+    self.Config.ChairStaminaConsumptionReduction = options:addSlider("ChairStaminaConsumptionReduction", "Chair Stamina Consumption Reduction", 0.0, 1.0, 0.01, 0.75)  
+    self.Config.MinChairRestTime = options:addSlider("MinChairRestTime", "Min Chair Rest Time (hours)", 0.0, 5.0, 0.01, 0.1)  
+    self.Config.MinBuffDuration = options:addSlider("MinBuffDuration", "Min Buff Duration (hours)", 0.0, 5.0, 0.01, 0.1)  
+    self.Config.MaxBuffDuration = options:addSlider("MaxBuffDuration", "Max Buff Duration (hours)", 0.0, 10.0, 0.01, 1.0)  
+    
+    -- Vehicle bonuses
+    self.Config.VehicleStaminaRegenMultiplier = options:addSlider("VehicleStaminaRegenMultiplier", "Vehicle Stamina Regen Multiplier", 0.5, 3.0, 0.01, 1.10)  
+    self.Config.VehicleStaminaConsumptionReduction = options:addSlider("VehicleStaminaConsumptionReduction", "Vehicle Stamina Consumption Reduction", 0.0, 1.0, 0.01, 0.5) 
+    
+    -- Bed bonuses
+    self.Config.BedStaminaRegenMultiplier = options:addSlider("BedStaminaRegenMultiplier", "Bed Stamina Regen Multiplier", 0.5, 3.0, 0.01, 1.2)  
+    self.Config.BedHPRegenMultiplier = options:addSlider("BedHPRegenMultiplier", "Bed HP Regen Multiplier", 0.5, 5.0, 0.01, 2.0)  
+    self.Config.BedMuscleFatigueReduction = options:addSlider("BedMuscleFatigueReduction", "Bed Muscle Fatigue Reduction", 0.0, 1.0, 0.01, 0.30)  
+end
+
+function BetterResting:syncOptions()
+    local options = PZAPI.ModOptions:getOptions(BetterResting.ModID)
+    
+    -- Chair/Sofa bonuses - match the capital letter option IDs from buildOptions
+    self.Config.ChairStaminaRegenMultiplier = options:getOption("ChairStaminaRegenMultiplier"):getValue()
+    self.Config.ChairBuffDuration = options:getOption("ChairBuffDuration"):getValue()
+    self.Config.ChairStaminaConsumptionReduction = options:getOption("ChairStaminaConsumptionReduction"):getValue()
+    self.Config.MinChairRestTime = options:getOption("MinChairRestTime"):getValue()
+    self.Config.MinBuffDuration = options:getOption("MinBuffDuration"):getValue()
+    self.Config.MaxBuffDuration = options:getOption("MaxBuffDuration"):getValue()
+    
+    -- Vehicle bonuses
+    self.Config.VehicleStaminaRegenMultiplier = options:getOption("VehicleStaminaRegenMultiplier"):getValue()
+    self.Config.VehicleStaminaConsumptionReduction = options:getOption("VehicleStaminaConsumptionReduction"):getValue()
+    
+    -- Bed bonuses
+    self.Config.BedStaminaRegenMultiplier = options:getOption("BedStaminaRegenMultiplier"):getValue()
+    self.Config.BedHPRegenMultiplier = options:getOption("BedHPRegenMultiplier"):getValue()
+    self.Config.BedMuscleFatigueReduction = options:getOption("BedMuscleFatigueReduction"):getValue()
+end
+
+function BetterResting:OnGameBoot()
+    self.buildOptions()
+end
+
+function BetterResting:onTick()
+    self:syncOptions()
+end
+
 local gameTime
 Events.OnGameTimeLoaded.Add(function()
     gameTime = GameTime.getInstance()
 end)
 
 function BetterResting.getCurrentGameHours()
-    if not gameTime then
+    if not gameTime then --checker incase api changes
+        print("BetterResting [SHARED] ERROR: getGameTime() returned nil!")
         return 0 
     end
-    
-    local calendar = Calendar.getInstance()
-    if calendar then
-        local timeInMillis = calendar:getTimeInMillis()
-        return timeInMillis / (1000 * 60)
-    end
-    
     return gameTime:getMultiplier()
 end
 
@@ -60,7 +108,6 @@ function BetterResting.isPlayerResting(player)
     end
     return false
 end
-
 function BetterResting.isActuallyVehicle(player)
     local vehicle = player:getVehicle()
     if vehicle then
@@ -117,15 +164,17 @@ function BetterResting.isActuallyBed(player)
                     
                     if customItemStr and BetterResting.BedCustomItems[customItemStr] then
                         isActuallyBed = true
+                    else
+
                     end
                 end
             end
             
             if bed and not isActuallyBed then
                 bed = nil
+                    end
+                end
             end
-        end
-    end
             
     if bed then
         return BetterResting.RestType.BED
@@ -138,6 +187,7 @@ function BetterResting.isActuallyChair(player)
     local isSittingOnFurniture = false
     if player.isSittingOnFurniture then
         isSittingOnFurniture = player:isSittingOnFurniture()
+    else
     end
     
     if isSittingOnFurniture then
@@ -168,8 +218,8 @@ function BetterResting.isActuallyChair(player)
                                    spriteNameLower:find("bedding") or 
                                    spriteNameLower:find("sleeping") then
                                 isBedObject = true
-                            end
-                        end
+                end
+            end
                     end
                 end
                 
@@ -188,25 +238,26 @@ function BetterResting.isActuallyChair(player)
                         if customItemStr then
                             if BetterResting.BedCustomItems[customItemStr] then
                                 isBedObject = true
-                            end
                         end
                     end
                 end
-                
+            end
+            
                 if not isSeatingFurniture and not isBedObject then
                     if furnitureObj.getProperties then
                         local props = furnitureObj:getProperties()
                         if props then
                             if props:get("bed") or props:get("BedType") then
                                 isBedObject = true
+
                             end
                         end
                     end
                     if furnitureObj.bed or furnitureObj.BedType then
                         isBedObject = true
-                    end
                 end
-                
+            end
+            
                 if isBedObject then
                     return BetterResting.RestType.BED
                 end
@@ -249,6 +300,7 @@ end
 function BetterResting.detectRestType(player)
     local isActuallyResting = BetterResting.isPlayerResting(player)
 
+    --first check Method
     if BetterResting.isActuallyVehicle(player) == BetterResting.RestType.VEHICLE then
         return BetterResting.RestType.VEHICLE
     end
@@ -270,7 +322,7 @@ function BetterResting.detectRestType(player)
             return BetterResting.RestType.BED
         end
 
-        if player:isSitOnGround() then
+        if player.isSitOnGround() then
             return BetterResting.RestType.FLOOR
         end
     end
@@ -284,12 +336,105 @@ function BetterResting.detectRestType(player)
         return BetterResting.RestType.NOT_RESTING
     end
 
+    -- Final fallback
     return BetterResting.RestType.NOT_RESTING
 end
+
+StiffnessData = {}
+StiffnessData.__index = StiffnessData
+
+function StiffnessData:new(player)
+    local o = {}
+    setmetatable(o, self)
+    self.__index = self
+    
+    o.player = player
+    o.playerNum = player:getPlayerNum()
+    o.bodyParts = {}
+    o.tolerance = 0.01
+    
+    return o
+end
+
+function StiffnessData:getPlayer()
+    return self.player
+end
+
+function StiffnessData:getPlayerNum()
+    return self.playerNum
+end
+
+BedStiffnessAction = {}
+BedStiffnessAction.__index = BedStiffnessAction
+setmetatable(BedStiffnessAction, {__index = StiffnessData})
+
+function BedStiffnessAction:new(player, updateCounter)
+    local o = StiffnessData.new(StiffnessData, player)
+    setmetatable(o, self)
+    self.__index = self
+    
+    o.updateCounter = updateCounter
+    o.reductionRate = 0.002 * BetterResting.Config.BedMuscleFatigueReduction * 100
+    o.bodyPartsModified = false
+    
+    return o
+end
+
+function BedStiffnessAction:processStiffness(bodyPart, partIndex, expectedStiffness)
+    if not bodyPart or not bodyPart.getStiffness or not bodyPart.setStiffness then
+        return nil
+    end
+    
+    local stiffness = bodyPart:getStiffness()
+    local partKey = tostring(self.playerNum) .. "_" .. tostring(partIndex)
+    
+    if not stiffness or stiffness <= 0 then
+        expectedStiffness[partKey] = nil
+        return nil
+    end
+    
+    local expectedValue = expectedStiffness[partKey]
+    
+    local newStiffness
+    if expectedValue then
+        newStiffness = math.max(0, expectedValue - self.reductionRate)
+    else
+        newStiffness = math.max(0, stiffness - self.reductionRate)
+    end
+    
+    if newStiffness <= 0 then
+        expectedStiffness[partKey] = nil
+    else
+        expectedStiffness[partKey] = newStiffness
+    end
+    
+    if math.abs(stiffness - newStiffness) > self.tolerance then
+ 
+        bodyPart:setStiffness(newStiffness)
+        self.bodyPartsModified = true
+        return newStiffness
+    end
+    
+    return newStiffness
+end
+
+function BedStiffnessAction:syncBodyDamage(bodyDamage)
+    if self.bodyPartsModified and isServer() then
+        if bodyDamage and bodyDamage.Update then
+            bodyDamage:Update()
+        end
+    end
+end
+
+bedwoundRestingStiffness = bedwoundRestingStiffness or {}
+--- @param character IsoPlayer The player character object
+--- @return table|nil The stiffness handler instance, or nil if not resting on bed
 
 bedRestingStiffness = bedRestingStiffness or {}
 bedRestingStiffness.__index = bedRestingStiffness
 
+--- @param character IsoPlayer The player character object
+--- @return table|nil The stiffness handler instance, or nil if not resting on bed
 function bedRestingStiffness:new(character)
     if not character then
         return nil
@@ -300,6 +445,7 @@ function bedRestingStiffness:new(character)
         return nil  
     end
     
+    -- Create instance
     local o = {}
     setmetatable(o, self)
     self.__index = self
@@ -316,56 +462,14 @@ function bedRestingStiffness:new(character)
     if bodyParts then
         for i = 0, bodyParts:size() - 1 do
             local bodyPart = bodyParts:get(i)
-            if bodyPart then
-                if bodyPart.getStiffness and bodyPart.setStiffness then
-                    local stiffness = bodyPart:getStiffness()
-                    if stiffness and stiffness > 0 then
-                        local reduction = 0.002 * BetterResting.Config.BedMuscleFatigueReduction * 100
-                        local newStiffness = math.max(0, stiffness - reduction)
-                        
-                        bodyPart:setStiffness(newStiffness)
-                        o.bodyPartsModified = true
-                    end
-                end
-                
-                local baseReductionPerTick = 0.001 * (BetterResting.Config.BedWoundHealingMultiplier - 1.0)
-                
-                local function reduceWoundTime(getFunc, setFunc)
-                    if getFunc and setFunc then
-                        local currentTime = getFunc(bodyPart)
-                        if currentTime and currentTime > 0 then
-                            local newTime = math.max(0, currentTime - baseReductionPerTick)
-                            setFunc(bodyPart, newTime)
-                            if newTime ~= currentTime then
-                                o.bodyPartsModified = true
-                            end
-                        end
-                    end
-                end
-                
-                if bodyPart.getScratchTime and bodyPart.setScratchTime then
-                    reduceWoundTime(bodyPart.getScratchTime, bodyPart.setScratchTime)
-                end
-                if bodyPart.getCutTime and bodyPart.setCutTime then
-                    reduceWoundTime(bodyPart.getCutTime, bodyPart.setCutTime)
-                end
-                if bodyPart.getBiteTime and bodyPart.setBiteTime then
-                    reduceWoundTime(bodyPart.getBiteTime, bodyPart.setBiteTime)
-                end
-                if bodyPart.getDeepWoundTime and bodyPart.setDeepWoundTime then
-                    reduceWoundTime(bodyPart.getDeepWoundTime, bodyPart.setDeepWoundTime)
-                end
-                if bodyPart.getBleedingTime and bodyPart.setBleedingTime then
-                    reduceWoundTime(bodyPart.getBleedingTime, bodyPart.setBleedingTime)
-                end
-                if bodyPart.getStitchTime and bodyPart.setStitchTime then
-                    reduceWoundTime(bodyPart.getStitchTime, bodyPart.setStitchTime)
-                end
-                if bodyPart.getBurnTime and bodyPart.setBurnTime then
-                    reduceWoundTime(bodyPart.getBurnTime, bodyPart.setBurnTime)
-                end
-                if bodyPart.getFractureTime and bodyPart.setFractureTime then
-                    reduceWoundTime(bodyPart.getFractureTime, bodyPart.setFractureTime)
+            if bodyPart and bodyPart.getStiffness and bodyPart.setStiffness then
+                local stiffness = bodyPart:getStiffness()
+                if stiffness and stiffness > 0 then
+                    local reduction = 0.002 * BetterResting.Config.BedMuscleFatigueReduction * 100
+                    local newStiffness = math.max(0, stiffness - reduction)
+                    
+                    bodyPart:setStiffness(newStiffness)
+                    o.bodyPartsModified = true
                 end
             end
         end
@@ -380,6 +484,13 @@ function bedRestingStiffness:new(character)
     return o
 end
 
+Events.OnGameBoot.Add(function()
+    BetterResting:OnGameBoot()
+end)
+Events.OnTick.Add(function()
+    BetterResting:onTick()
+end)
+
 if isClient() and not isServer() then
     Events.OnPlayerUpdate.Add(function(player)
         if not player then return end
@@ -387,10 +498,6 @@ if isClient() and not isServer() then
         local restType = BetterResting.detectRestType(player)
         if restType == BetterResting.RestType.BED then
             sendClientCommand(player, "BetterResting", "ReduceStiffness", {})
-        elseif restType == BetterResting.RestType.CHAIR then
-            sendClientCommand(player, "BetterResting", "ProcessChairResting", {})
-        elseif restType == BetterResting.RestType.VEHICLE then
-            sendClientCommand(player, "BetterResting", "ProcessVehicleResting", {})
         end
     end)
 end
