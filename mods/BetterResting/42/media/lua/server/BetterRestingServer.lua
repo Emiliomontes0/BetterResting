@@ -46,13 +46,15 @@ function BetterResting.Server:applyChairBuff(player, data)
     
     if stamina >= 0.99 and not data.wasFullStamina then
         if data.chairRestStartStamina and data.chairRestStartStamina < 0.75 then
-            local BuffDurationMinutes = 5.0
+            -- ChairBuffDuration is in seconds (real time), convert to minutes
+            local BuffDurationMinutes = BetterResting.Config.ChairBuffDuration / 60.0
 
             data.chairBuffActive = true
             
             local calendar = Calendar.getInstance()
             local currentTimeMinutes = 0
             if calendar then
+                -- Real time in minutes (not game time)
                 currentTimeMinutes = calendar:getTimeInMillis() / (1000 * 60)
             else
                 currentTimeMinutes = BetterResting.getCurrentGameHours() * 60
@@ -114,6 +116,10 @@ function BetterResting.Server.Commands.BetterResting.ReduceStiffness(module, com
     bedRestingStiffness:new(player)
 end
 
+function BetterResting.Server.Commands.BetterResting.HealWounds(module, command, player, args)
+    bedWoundHealing:new(player)
+end
+
 function BetterResting.Server.Commands.BetterResting.ProcessChairResting(module, command, player, args)
     if not player then return end
     local data = BetterResting.Server:initPlayerData(player)
@@ -126,8 +132,40 @@ function BetterResting.Server.Commands.BetterResting.ProcessVehicleResting(modul
     BetterResting.Server:processVehicleResting(player, data, 0)
 end
 
+function BetterResting.Server.Commands.BetterResting.ProcessBedResting(module, command, player, args)
+    if not player then return end
+    local data = BetterResting.Server:initPlayerData(player)
+    BetterResting.Server:processBedStaminaRegen(player, data, 0)
+end
+
 function BetterResting.Server:processBedRestingStiffness(player, updateCounter)
     bedRestingStiffness:new(player)
+end
+
+function BetterResting.Server:processBedStaminaRegen(player, data, updateCounter)
+    local stats = player:getStats()
+    if not stats then return end
+    
+    -- Process stamina regen (similar to chair/vehicle)
+    local stamina = stats:get(CharacterStat.ENDURANCE)
+    if stamina and stamina < 1.0 then
+        local baseRegen = 0.001 
+        local bonusRegen = baseRegen * (BetterResting.Config.BedStaminaRegenMultiplier - 1.0)
+        local newStamina = math.min(1.0, stamina + bonusRegen)
+        
+        stats:set(CharacterStat.ENDURANCE, newStamina)
+    end
+end
+
+function BetterResting.Server:processBedResting(player, data, updateCounter)
+    -- Process stamina regen (similar to chair/vehicle)
+    self:processBedStaminaRegen(player, data, updateCounter)
+    
+    -- Process wound healing (reduce wound timers)
+    bedWoundHealing:new(player)
+    
+    -- Process muscle fatigue reduction (stiffness)
+    self:processBedRestingStiffness(player, updateCounter)
 end
 
 function BetterResting.Server:cleanupExpiredBuffs(player, data)
@@ -211,7 +249,7 @@ function BetterResting.Server:onPlayerUpdate(player)
     elseif restType == BetterResting.RestType.VEHICLE then
         self:processVehicleResting(player, data, updateCounter)
     elseif restType == BetterResting.RestType.BED then
-        self:processBedRestingStiffness(player, updateCounter)
+        self:processBedResting(player, data, updateCounter)
     end
     
     self:applyChairBuffEffect(player, data)

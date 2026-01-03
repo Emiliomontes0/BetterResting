@@ -10,11 +10,8 @@ BetterResting.ModName = "BetterResting"
 BetterResting.Config = {
     -- Chair/Sofa bonuses
     ChairStaminaRegenMultiplier = 1.07,       -- 7% faster stamina regen on chairs
-    ChairBuffDuration = 600,                  -- 10 minutes = 600 seconds (game time)
+    ChairBuffDuration = 600,                  -- 10 minutes = 600 seconds (real time, not game time)
     ChairStaminaConsumptionReduction = 0.75,  -- 25% reduction when buff active
-    MinChairRestTime = 0.1,
-    MinBuffDuration = 0.1,
-    MaxBuffDuration = 1.0,
     
     -- Vehicle bonuses
     VehicleStaminaRegenMultiplier = 1.10,     -- 10% faster stamina regen in vehicle
@@ -22,7 +19,7 @@ BetterResting.Config = {
     
     -- Bed bonuses
     BedStaminaRegenMultiplier = 1.2,          -- 20% faster stamina regen in bed
-    BedHPRegenMultiplier = 2.0,               -- 2x faster HP regen (gradual healing)
+    BedHPRegenMultiplier = 6.0,               -- 2x faster HP regen (gradual healing)
     BedMuscleFatigueReduction = 0.30,         -- 30% faster muscle fatigue recovery (increased from 15%)
     
     -- UI settings
@@ -40,52 +37,55 @@ BetterResting.RestType = {
 }
 
 function BetterResting:buildOptions()
-    local options = PZAPI.ModOptions:create(self.ModID, self.ModName)  
-    
-    -- Chair/Sofa bonuses
-    self.Config.ChairStaminaRegenMultiplier = options:addSlider("ChairStaminaRegenMultiplier", "Chair Stamina Regen Multiplier", 0.5, 3.0, 0.01, 1.07)
-    self.Config.ChairBuffDuration = options:addSlider("ChairBuffDuration", "Chair Buff Duration", 60, 3600, 60, 600)  
-    self.Config.ChairStaminaConsumptionReduction = options:addSlider("ChairStaminaConsumptionReduction", "Chair Stamina Consumption Reduction", 0.0, 1.0, 0.01, 0.75)  
-    self.Config.MinChairRestTime = options:addSlider("MinChairRestTime", "Min Chair Rest Time (hours)", 0.0, 5.0, 0.01, 0.1)  
-    self.Config.MinBuffDuration = options:addSlider("MinBuffDuration", "Min Buff Duration (hours)", 0.0, 5.0, 0.01, 0.1)  
-    self.Config.MaxBuffDuration = options:addSlider("MaxBuffDuration", "Max Buff Duration (hours)", 0.0, 10.0, 0.01, 1.0)  
-    
-    -- Vehicle bonuses
-    self.Config.VehicleStaminaRegenMultiplier = options:addSlider("VehicleStaminaRegenMultiplier", "Vehicle Stamina Regen Multiplier", 0.5, 3.0, 0.01, 1.10)  
-    self.Config.VehicleStaminaConsumptionReduction = options:addSlider("VehicleStaminaConsumptionReduction", "Vehicle Stamina Consumption Reduction", 0.0, 1.0, 0.01, 0.5) 
-    
-    -- Bed bonuses
-    self.Config.BedStaminaRegenMultiplier = options:addSlider("BedStaminaRegenMultiplier", "Bed Stamina Regen Multiplier", 0.5, 3.0, 0.01, 1.2)  
-    self.Config.BedHPRegenMultiplier = options:addSlider("BedHPRegenMultiplier", "Bed HP Regen Multiplier", 0.5, 5.0, 0.01, 2.0)  
-    self.Config.BedMuscleFatigueReduction = options:addSlider("BedMuscleFatigueReduction", "Bed Muscle Fatigue Reduction", 0.0, 1.0, 0.01, 0.30)  
-    
-    -- UI settings (using slider: 0 = false, 1 = true)
-    self.Config.ShowMessages = options:addSlider("ShowMessages", "Show Messages Above Player", 0.0, 1.0, 1.0, 1.0)
+    -- Sandbox options are now defined in sandbox-options.txt
+    -- This function is kept for compatibility but no longer needed
 end
 
 function BetterResting:syncOptions()
-    local options = PZAPI.ModOptions:getOptions(BetterResting.ModID)
+    local sandboxOptions = SandboxOptions.getInstance()
+    if not sandboxOptions then
+        return
+    end
     
-    -- Chair/Sofa bonuses - match the capital letter option IDs from buildOptions
-    self.Config.ChairStaminaRegenMultiplier = options:getOption("ChairStaminaRegenMultiplier"):getValue()
-    self.Config.ChairBuffDuration = options:getOption("ChairBuffDuration"):getValue()
-    self.Config.ChairStaminaConsumptionReduction = options:getOption("ChairStaminaConsumptionReduction"):getValue()
-    self.Config.MinChairRestTime = options:getOption("MinChairRestTime"):getValue()
-    self.Config.MinBuffDuration = options:getOption("MinBuffDuration"):getValue()
-    self.Config.MaxBuffDuration = options:getOption("MaxBuffDuration"):getValue()
+    -- Helper function to safely get option value
+    local function getOptionValue(optionName)
+        local option = sandboxOptions:getOptionByName(optionName)
+        if option then
+            return option:getValue()
+        end
+        return nil
+    end
+    
+    -- Chair/Sofa bonuses
+    local chairStaminaRegen = getOptionValue("BetterResting.ChairStaminaRegenMultiplier")
+    if chairStaminaRegen then self.Config.ChairStaminaRegenMultiplier = chairStaminaRegen end
+    
+    local chairBuffDuration = getOptionValue("BetterResting.ChairBuffDuration")
+    if chairBuffDuration then self.Config.ChairBuffDuration = chairBuffDuration end
+    
+    local chairStaminaConsumption = getOptionValue("BetterResting.ChairStaminaConsumptionReduction")
+    if chairStaminaConsumption then self.Config.ChairStaminaConsumptionReduction = chairStaminaConsumption end
     
     -- Vehicle bonuses
-    self.Config.VehicleStaminaRegenMultiplier = options:getOption("VehicleStaminaRegenMultiplier"):getValue()
-    self.Config.VehicleStaminaConsumptionReduction = options:getOption("VehicleStaminaConsumptionReduction"):getValue()
+    local vehicleStaminaRegen = getOptionValue("BetterResting.VehicleStaminaRegenMultiplier")
+    if vehicleStaminaRegen then self.Config.VehicleStaminaRegenMultiplier = vehicleStaminaRegen end
+    
+    local vehicleStaminaConsumption = getOptionValue("BetterResting.VehicleStaminaConsumptionReduction")
+    if vehicleStaminaConsumption then self.Config.VehicleStaminaConsumptionReduction = vehicleStaminaConsumption end
     
     -- Bed bonuses
-    self.Config.BedStaminaRegenMultiplier = options:getOption("BedStaminaRegenMultiplier"):getValue()
-    self.Config.BedHPRegenMultiplier = options:getOption("BedHPRegenMultiplier"):getValue()
-    self.Config.BedMuscleFatigueReduction = options:getOption("BedMuscleFatigueReduction"):getValue()
+    local bedStaminaRegen = getOptionValue("BetterResting.BedStaminaRegenMultiplier")
+    if bedStaminaRegen then self.Config.BedStaminaRegenMultiplier = bedStaminaRegen end
     
-    -- UI settings (convert slider value 0/1 to boolean)
-    local showMessagesValue = options:getOption("ShowMessages"):getValue()
-    self.Config.ShowMessages = (showMessagesValue >= 1.0)
+    local bedHPRegen = getOptionValue("BetterResting.BedHPRegenMultiplier")
+    if bedHPRegen then self.Config.BedHPRegenMultiplier = bedHPRegen end
+    
+    local bedMuscleFatigue = getOptionValue("BetterResting.BedMuscleFatigueReduction")
+    if bedMuscleFatigue then self.Config.BedMuscleFatigueReduction = bedMuscleFatigue end
+    
+    -- UI settings (boolean)
+    local showMessages = getOptionValue("BetterResting.ShowMessages")
+    if showMessages ~= nil then self.Config.ShowMessages = showMessages end
 end
 
 function BetterResting:OnGameBoot()
@@ -436,10 +436,6 @@ function BedStiffnessAction:syncBodyDamage(bodyDamage)
     end
 end
 
-bedwoundRestingStiffness = bedwoundRestingStiffness or {}
---- @param character IsoPlayer The player character object
---- @return table|nil The stiffness handler instance, or nil if not resting on bed
-
 bedRestingStiffness = bedRestingStiffness or {}
 bedRestingStiffness.__index = bedRestingStiffness
 
@@ -494,6 +490,126 @@ function bedRestingStiffness:new(character)
     return o
 end
 
+bedWoundHealing = bedWoundHealing or {}
+bedWoundHealing.__index = bedWoundHealing
+
+--- @param character IsoPlayer The player character object
+--- @return table|nil The wound healing handler instance, or nil if not resting on bed
+function bedWoundHealing:new(character)
+    if not character then
+        return nil
+    end
+    
+    local restType = BetterResting.detectRestType(character)
+    if restType ~= BetterResting.RestType.BED then
+        return nil  
+    end
+    
+    -- Create instance
+    local o = {}
+    setmetatable(o, self)
+    self.__index = self
+    
+    o.character = character
+    o.bodyPartsModified = false
+    
+    local bodyDamage = character:getBodyDamage()
+    if not bodyDamage then
+        return nil
+    end
+    
+    local bodyParts = bodyDamage:getBodyParts()
+    if bodyParts then
+        -- Base reduction rate per update (matching old working code)
+        local reduction = 0.001 * BetterResting.Config.BedHPRegenMultiplier
+        
+        -- Use same loop structure as old code (1 to size, get(i-1))
+        for i = 1, bodyParts:size() do
+            local bodyPart = bodyParts:get(i - 1)
+            if bodyPart then
+                -- Reduce scratch healing time
+                if bodyPart.getScratchTime and bodyPart.setScratchTime and bodyPart.setScratched then
+                    local scratchTime = bodyPart:getScratchTime()
+                    if scratchTime and scratchTime > 0 then
+                        local newTime = math.max(0, scratchTime - reduction)
+                        if newTime <= 0 then
+                            bodyPart:setScratched(false, true)
+                        else
+                            bodyPart:setScratchTime(newTime)
+                        end
+                        o.bodyPartsModified = true
+                    end
+                end
+                
+                -- Reduce cut healing time
+                if bodyPart.getCutTime and bodyPart.setCutTime and bodyPart.setCut then
+                    local cutTime = bodyPart:getCutTime()
+                    if cutTime and cutTime > 0 then
+                        local newTime = math.max(0, cutTime - reduction)
+                        if newTime <= 0 then
+                            bodyPart:setCut(false)
+                        else
+                            bodyPart:setCutTime(newTime)
+                        end
+                        o.bodyPartsModified = true
+                    end
+                end
+                
+                -- Reduce deep wound healing time
+                if bodyPart.getDeepWoundTime and bodyPart.setDeepWoundTime and bodyPart.setDeepWounded then
+                    local deepWoundTime = bodyPart:getDeepWoundTime()
+                    if deepWoundTime and deepWoundTime > 0 then
+                        local newTime = math.max(0, deepWoundTime - reduction)
+                        bodyPart:setDeepWoundTime(newTime)
+                        if newTime <= 0 then
+                            bodyPart:setDeepWounded(false)
+                        end
+                        o.bodyPartsModified = true
+                    end
+                end
+                
+                -- Reduce bleeding time
+                if bodyPart.getBleedingTime and bodyPart.setBleedingTime then
+                    local bleedingTime = bodyPart:getBleedingTime()
+                    if bleedingTime and bleedingTime > 0 then
+                        local newTime = math.max(0, bleedingTime - reduction)
+                        bodyPart:setBleedingTime(newTime)
+                        o.bodyPartsModified = true
+                    end
+                end
+                
+                -- Reduce stitch healing time
+                if bodyPart.getStitchTime and bodyPart.setStitchTime then
+                    local stitchTime = bodyPart:getStitchTime()
+                    if stitchTime and stitchTime > 0 then
+                        local newTime = math.max(0, stitchTime - reduction)
+                        bodyPart:setStitchTime(newTime)
+                        o.bodyPartsModified = true
+                    end
+                end
+                
+                -- Reduce burn healing time
+                if bodyPart.getBurnTime and bodyPart.setBurnTime then
+                    local burnTime = bodyPart:getBurnTime()
+                    if burnTime and burnTime > 0 then
+                        local newTime = math.max(0, burnTime - reduction)
+                        bodyPart:setBurnTime(newTime)
+                        o.bodyPartsModified = true
+                    end
+                end
+            end
+        end
+        
+        if o.bodyPartsModified and isServer() then
+            if bodyDamage.Update then
+                bodyDamage:Update()
+            end
+        end
+    end
+    
+    return o
+end
+
 Events.OnGameBoot.Add(function()
     BetterResting:OnGameBoot()
 end)
@@ -507,7 +623,13 @@ if isClient() and not isServer() then
         
         local restType = BetterResting.detectRestType(player)
         if restType == BetterResting.RestType.BED then
+            sendClientCommand(player, "BetterResting", "ProcessBedResting", {})
             sendClientCommand(player, "BetterResting", "ReduceStiffness", {})
+            sendClientCommand(player, "BetterResting", "HealWounds", {})
+        elseif restType == BetterResting.RestType.CHAIR then
+            sendClientCommand(player, "BetterResting", "ProcessChairResting", {})
+        elseif restType == BetterResting.RestType.VEHICLE then
+            sendClientCommand(player, "BetterResting", "ProcessVehicleResting", {})
         end
     end)
 end
