@@ -16,7 +16,7 @@ local confirmationTimer = 0
 local function showBuffMessage(buffType, duration, buffEndTime)
     if buffType == "chair" then
         local player = getPlayer()
-        if player then
+        if player and BetterResting.Config.ShowMessages then
             local durationText = ""
             if duration then
                 durationText = " (" .. duration .. " minutes)"
@@ -32,7 +32,7 @@ end
 local function showBuffExpired(buffType)
     if buffType == "chair" then
         local player = getPlayer()
-        if player then
+        if player and BetterResting.Config.ShowMessages then
             HaloTextHelper.addTextWithArrow(player, "Rested feeling fades...", true, 255, 0, 0)
             clientBuffData.chairBuffActive = false
         end
@@ -100,40 +100,46 @@ Events.OnPlayerUpdate.Add(function(player)
     end
     
     if restType ~= lastRestType and restType ~= BetterResting.RestType.FLOOR then
-        local messages = {
-            [BetterResting.RestType.CHAIR] = "Resting on furniture - Enhanced stamina recovery",
-            [BetterResting.RestType.VEHICLE] = "Resting in vehicle - Maximum stamina recovery",
-            [BetterResting.RestType.BED] = "Resting in bed - Wounds and muscle strain",
-        }
-        
-        if messages[restType] then
-            restMessageData.startTick = updateCounter
-            restMessageData.message = messages[restType]
-            restMessageData.lastRefresh = updateCounter
-            HaloTextHelper.addTextWithArrow(player, messages[restType], true, 0, 100, 255)
+        if BetterResting.Config.ShowMessages then
+            local messages = {
+                [BetterResting.RestType.CHAIR] = "Resting on furniture - Enhanced stamina recovery",
+                [BetterResting.RestType.VEHICLE] = "Resting in vehicle - Maximum stamina recovery",
+                [BetterResting.RestType.BED] = "Resting in bed - Wounds and muscle strain",
+            }
+            
+            if messages[restType] then
+                restMessageData.startTick = updateCounter
+                restMessageData.message = messages[restType]
+                restMessageData.lastRefresh = updateCounter
+                HaloTextHelper.addTextWithArrow(player, messages[restType], true, 0, 100, 255)
+            end
         end
     end
     
     if restType ~= BetterResting.RestType.FLOOR then
-        local messages = {
-            [BetterResting.RestType.CHAIR] = "Resting on furniture - Enhanced stamina recovery",
-            [BetterResting.RestType.VEHICLE] = "Resting in vehicle - Maximum stamina recovery",
-            [BetterResting.RestType.BED] = "Resting in bed - Wounds and muscle strain",
-        }
-        
-        local currentMessage = messages[restType]
-        if currentMessage then
-            restMessageData.message = currentMessage
+        if BetterResting.Config.ShowMessages then
+            local messages = {
+                [BetterResting.RestType.CHAIR] = "Resting on furniture - Enhanced stamina recovery",
+                [BetterResting.RestType.VEHICLE] = "Resting in vehicle - Maximum stamina recovery",
+                [BetterResting.RestType.BED] = "Resting in bed - Wounds and muscle strain",
+            }
             
-            local elapsed = updateCounter - restMessageData.startTick
-            if elapsed < restMessageData.duration then
-                if updateCounter - restMessageData.lastRefresh >= restMessageData.refreshInterval then
-                    HaloTextHelper.addTextWithArrow(player, currentMessage, true, 0, 100, 255)
-                    restMessageData.lastRefresh = updateCounter
+            local currentMessage = messages[restType]
+            if currentMessage then
+                restMessageData.message = currentMessage
+                
+                local elapsed = updateCounter - restMessageData.startTick
+                if elapsed < restMessageData.duration then
+                    if updateCounter - restMessageData.lastRefresh >= restMessageData.refreshInterval then
+                        HaloTextHelper.addTextWithArrow(player, currentMessage, true, 0, 100, 255)
+                        restMessageData.lastRefresh = updateCounter
+                    end
+                else
+                    restMessageData.message = nil
                 end
-            else
-                restMessageData.message = nil
             end
+        else
+            restMessageData.message = nil
         end
     else
         restMessageData.message = nil
@@ -145,7 +151,7 @@ Events.OnPlayerUpdate.Add(function(player)
     
     lastRestType = restType
     
-    if clientBuffData.chairBuffActive then
+    if clientBuffData.chairBuffActive and BetterResting.Config.ShowMessages then
         local currentTime = Calendar.getInstance():getTimeInMillis() / 1000
         local timeSinceLastIndicator = currentTime - clientBuffData.lastIndicatorTime
         
@@ -164,7 +170,7 @@ local function initBetterResting()
     local player = getPlayer()
     if not player then return end
     
-    if not hasShownInitialMessage then
+    if not hasShownInitialMessage and BetterResting.Config.ShowMessages then
         HaloTextHelper.addTextWithArrow(player, "BetterResting Mod Loaded!", true, 0, 255, 0)
         hasShownInitialMessage = true
     end
@@ -209,7 +215,7 @@ function BetterRestingTest.checkBuff()
         return
     end
     
-    if BetterResting and BetterResting.ClientBuffData then
+    if BetterResting and BetterResting.ClientBuffData and BetterResting.Config.ShowMessages then
         if BetterResting.ClientBuffData.chairBuffActive then
             local currentHours = BetterResting.getCurrentGameHours()
             local endTime = BetterResting.ClientBuffData.chairBuffEndTime

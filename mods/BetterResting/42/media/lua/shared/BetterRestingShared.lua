@@ -24,6 +24,9 @@ BetterResting.Config = {
     BedStaminaRegenMultiplier = 1.2,          -- 20% faster stamina regen in bed
     BedHPRegenMultiplier = 2.0,               -- 2x faster HP regen (gradual healing)
     BedMuscleFatigueReduction = 0.30,         -- 30% faster muscle fatigue recovery (increased from 15%)
+    
+    -- UI settings
+    ShowMessages = true,                      -- Show all messages above player (rest type, buffs, etc.)
 
 }
 
@@ -55,6 +58,9 @@ function BetterResting:buildOptions()
     self.Config.BedStaminaRegenMultiplier = options:addSlider("BedStaminaRegenMultiplier", "Bed Stamina Regen Multiplier", 0.5, 3.0, 0.01, 1.2)  
     self.Config.BedHPRegenMultiplier = options:addSlider("BedHPRegenMultiplier", "Bed HP Regen Multiplier", 0.5, 5.0, 0.01, 2.0)  
     self.Config.BedMuscleFatigueReduction = options:addSlider("BedMuscleFatigueReduction", "Bed Muscle Fatigue Reduction", 0.0, 1.0, 0.01, 0.30)  
+    
+    -- UI settings (using slider: 0 = false, 1 = true)
+    self.Config.ShowMessages = options:addSlider("ShowMessages", "Show Messages Above Player", 0.0, 1.0, 1.0, 1.0)
 end
 
 function BetterResting:syncOptions()
@@ -76,10 +82,14 @@ function BetterResting:syncOptions()
     self.Config.BedStaminaRegenMultiplier = options:getOption("BedStaminaRegenMultiplier"):getValue()
     self.Config.BedHPRegenMultiplier = options:getOption("BedHPRegenMultiplier"):getValue()
     self.Config.BedMuscleFatigueReduction = options:getOption("BedMuscleFatigueReduction"):getValue()
+    
+    -- UI settings (convert slider value 0/1 to boolean)
+    local showMessagesValue = options:getOption("ShowMessages"):getValue()
+    self.Config.ShowMessages = (showMessagesValue >= 1.0)
 end
 
 function BetterResting:OnGameBoot()
-    self.buildOptions()
+    self:buildOptions()
 end
 
 function BetterResting:onTick()
