@@ -332,7 +332,7 @@ function BetterResting.detectRestType(player)
             return BetterResting.RestType.BED
         end
 
-        if player.isSitOnGround() then
+        if player:isSitOnGround() then
             return BetterResting.RestType.FLOOR
         end
     end
