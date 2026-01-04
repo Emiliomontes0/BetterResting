@@ -527,8 +527,16 @@ function bedWoundHealing:new(character)
         for i = 1, bodyParts:size() do
             local bodyPart = bodyParts:get(i - 1)
             if bodyPart then
-                -- Reduce scratch healing time
-                if bodyPart.getScratchTime and bodyPart.setScratchTime and bodyPart.setScratched then
+                -- Only heal wounds if they are bandaged or stitched (treated wounds)
+                local isTreated = false
+                if bodyPart.bandaged and bodyPart:bandaged() then
+                    isTreated = true
+                elseif bodyPart.stitched and bodyPart:stitched() then
+                    isTreated = true
+                end
+                
+                -- Reduce scratch healing time (only if treated)
+                if isTreated and bodyPart.getScratchTime and bodyPart.setScratchTime and bodyPart.setScratched then
                     local scratchTime = bodyPart:getScratchTime()
                     if scratchTime and scratchTime > 0 then
                         local newTime = math.max(0, scratchTime - reduction)
@@ -541,8 +549,8 @@ function bedWoundHealing:new(character)
                     end
                 end
                 
-                -- Reduce cut healing time
-                if bodyPart.getCutTime and bodyPart.setCutTime and bodyPart.setCut then
+                -- Reduce cut healing time (only if treated)
+                if isTreated and bodyPart.getCutTime and bodyPart.setCutTime and bodyPart.setCut then
                     local cutTime = bodyPart:getCutTime()
                     if cutTime and cutTime > 0 then
                         local newTime = math.max(0, cutTime - reduction)
@@ -555,8 +563,8 @@ function bedWoundHealing:new(character)
                     end
                 end
                 
-                -- Reduce deep wound healing time
-                if bodyPart.getDeepWoundTime and bodyPart.setDeepWoundTime and bodyPart.setDeepWounded then
+                -- Reduce deep wound healing time (only if treated)
+                if isTreated and bodyPart.getDeepWoundTime and bodyPart.setDeepWoundTime and bodyPart.setDeepWounded then
                     local deepWoundTime = bodyPart:getDeepWoundTime()
                     if deepWoundTime and deepWoundTime > 0 then
                         local newTime = math.max(0, deepWoundTime - reduction)
@@ -568,8 +576,18 @@ function bedWoundHealing:new(character)
                     end
                 end
                 
-                -- Reduce bleeding time
-                if bodyPart.getBleedingTime and bodyPart.setBleedingTime then
+                -- Reduce bleeding time (only if bleeding is stemmed/cauterized/treated)
+                local isBleedingTreated = false
+                if bodyPart.IsBleedingStemmed and bodyPart:IsBleedingStemmed() then
+                    isBleedingTreated = true
+                elseif bodyPart.IsCauterized and bodyPart:IsCauterized() then
+                    isBleedingTreated = true
+                elseif isTreated then
+                    -- If wound is bandaged/stitched, bleeding should be treated
+                    isBleedingTreated = true
+                end
+                
+                if isBleedingTreated and bodyPart.getBleedingTime and bodyPart.setBleedingTime then
                     local bleedingTime = bodyPart:getBleedingTime()
                     if bleedingTime and bleedingTime > 0 then
                         local newTime = math.max(0, bleedingTime - reduction)
@@ -587,9 +605,8 @@ function bedWoundHealing:new(character)
                         o.bodyPartsModified = true
                     end
                 end
-                
-                -- Reduce burn healing time
-                if bodyPart.getBurnTime and bodyPart.setBurnTime then
+                -- Reduce burn healing time (only if treated/bandaged)
+                if isTreated and bodyPart.getBurnTime and bodyPart.setBurnTime then
                     local burnTime = bodyPart:getBurnTime()
                     if burnTime and burnTime > 0 then
                         local newTime = math.max(0, burnTime - reduction)
