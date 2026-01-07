@@ -63,7 +63,7 @@ This ensures accurate detection of:
 
 ## Requirements
 
-- Project Zomboid Build 42 or later
+- Project Zomboid Build 42.13.1 or later
 - No other mods required
 
 ## Technical Details
@@ -75,15 +75,11 @@ This ensures accurate detection of:
 
 ## Compatibility
 
-This mod is designed for Build 42. It may not work correctly with earlier builds.
-
-## Credits
-
-Created for Project Zomboid Build 42.
+This mod is designed for Build 42.13.1. It may not work correctly with earlier builds.
 
 ## License
 
-[Add your license here]
+MIT Licence
 
 ## Support
 
