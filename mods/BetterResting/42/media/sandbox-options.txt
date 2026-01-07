@@ -1,0 +1,56 @@
+VERSION = 1,
+
+option BetterResting.ChairStaminaRegenMultiplier
+{
+	type = double, min = 0.5, max = 3.0, default = 1.07,
+	page = BetterRestingChair, translation = BetterResting_ChairStaminaRegenMultiplier,
+}
+
+option BetterResting.ChairBuffDuration
+{
+	type = integer, min = 60, max = 3600, default = 600,
+	page = BetterRestingChair, translation = BetterResting_ChairBuffDurationRealTime,
+}
+
+option BetterResting.ChairStaminaConsumptionReduction
+{
+	type = double, min = 0.0, max = 1.0, default = 0.75,
+	page = BetterRestingChair, translation = BetterResting_ChairStaminaConsumptionReduction,
+}
+
+
+option BetterResting.VehicleStaminaRegenMultiplier
+{
+	type = double, min = 0.5, max = 3.0, default = 1.10,
+	page = BetterRestingVehicle, translation = BetterResting_VehicleStaminaRegenMultiplier,
+}
+
+option BetterResting.VehicleStaminaConsumptionReduction
+{
+	type = double, min = 0.0, max = 1.0, default = 0.5,
+	page = BetterRestingVehicle, translation = BetterResting_VehicleStaminaConsumptionReduction,
+}
+
+option BetterResting.BedStaminaRegenMultiplier
+{
+	type = double, min = 0.5, max = 3.0, default = 1.2,
+	page = BetterRestingBed, translation = BetterResting_BedStaminaRegenMultiplier,
+}
+
+option BetterResting.BedHPRegenMultiplier
+{
+	type = double, min = 0.5, max = 10.0, default = 2.0,
+	page = BetterRestingBed, translation = BetterResting_BedHPRegenMultiplier,
+}
+
+option BetterResting.BedMuscleFatigueReduction
+{
+	type = double, min = 0.0, max = 1.0, default = 0.30,
+	page = BetterRestingBed, translation = BetterResting_BedMuscleFatigueReduction,
+}
+
+option BetterResting.ShowMessages
+{
+	type = boolean, default = true,
+	page = BetterRestingUI, translation = BetterResting_ShowMessages,
+}
