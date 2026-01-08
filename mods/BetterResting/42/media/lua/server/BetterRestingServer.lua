@@ -257,9 +257,12 @@ function BetterResting.Server:onPlayerUpdate(player)
     self:cleanupExpiredBuffs(player, data)
 end
 
-Events.OnPlayerUpdate.Add(function(player) 
-    BetterResting.Server:onPlayerUpdate(player) 
-end)
+
+if not isServer() and not isClient() then
+    Events.OnPlayerUpdate.Add(function(player) 
+        BetterResting.Server:onPlayerUpdate(player) 
+    end)
+end
 
 Events.OnClientCommand.Add(function(module, command, player, args)
     if BetterResting.Server.Commands[module] and BetterResting.Server.Commands[module][command] then 
