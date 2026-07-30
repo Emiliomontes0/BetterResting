@@ -19,7 +19,7 @@ BetterResting.Config = {
     
     -- Bed bonuses
     BedStaminaRegenMultiplier = 1.2,          -- 20% faster stamina regen in bed
-    BedHPRegenMultiplier = 6.0,               -- 2x faster HP regen (gradual healing)
+    BedHPRegenMultiplier = 2.0,               -- Matches sandbox default; gradual wound healing speed
     BedMuscleFatigueReduction = 0.30,         -- 30% faster muscle fatigue recovery (increased from 15%)
     
     -- UI settings
@@ -102,22 +102,110 @@ Events.OnGameTimeLoaded.Add(function()
 end)
 
 function BetterResting.getCurrentGameHours()
-    if not gameTime then --checker incase api changes
-        print("BetterResting [SHARED] ERROR: getGameTime() returned nil!")
-        return 0 
+    if not gameTime then
+        gameTime = GameTime.getInstance()
     end
-    return gameTime:getMultiplier()
+    if not gameTime then
+        print("BetterResting [SHARED] ERROR: GameTime.getInstance() returned nil!")
+        return 0
+    end
+    if gameTime.getWorldAgeHours then
+        return gameTime:getWorldAgeHours()
+    end
+    print("BetterResting [SHARED] ERROR: getWorldAgeHours() unavailable!")
+    return 0
 end
 
-function BetterResting.isPlayerResting(player)
-    if player.isResting then
-        local isResting = player:isResting()
-        if isResting then
+local function getObjectSpriteName(obj)
+    if not obj or not obj.getSprite then
+        return nil
+    end
+    local sprite = obj:getSprite()
+    if not sprite or not sprite.getName then
+        return nil
+    end
+    local spriteName = sprite:getName()
+    if not spriteName then
+        return nil
+    end
+    return tostring(spriteName)
+end
+
+local function getObjectCustomItemStr(obj)
+    if not obj or not obj.getCustomItem then
+        return nil
+    end
+    local customItem = obj:getCustomItem()
+    if not customItem then
+        return nil
+    end
+    if type(customItem) == "string" then
+        return customItem
+    end
+    if customItem.getFullType then
+        return customItem:getFullType()
+    end
+    if customItem.getType then
+        return customItem:getType()
+    end
+    return nil
+end
+
+local function spriteNameLooksLikeSeating(spriteNameLower)
+    return spriteNameLower:find("seating", 1, true)
+        or spriteNameLower:find("chair", 1, true)
+        or spriteNameLower:find("sofa", 1, true)
+        or spriteNameLower:find("couch", 1, true)
+        or spriteNameLower:find("stool", 1, true)
+        or spriteNameLower:find("bench", 1, true)
+        or spriteNameLower:find("seat", 1, true)
+end
+
+local function spriteNameLooksLikeBed(spriteNameLower)
+    return spriteNameLower:find("bed", 1, true)
+        or spriteNameLower:find("bedding", 1, true)
+        or spriteNameLower:find("sleeping", 1, true)
+        or spriteNameLower:find("tent", 1, true)
+        or spriteNameLower:find("cot", 1, true)
+        or spriteNameLower:find("gurney", 1, true)
+        or spriteNameLower:find("camping_", 1, true)
+end
+
+local function objectHasBedProperty(obj)
+    if obj.getProperties then
+        local props = obj:getProperties()
+        if props and (props:get("bed") or props:get("BedType")) then
             return true
         end
     end
+    if obj.bed or obj.BedType then
+        return true
+    end
     return false
 end
+
+-- True when the player is in a rest/sit state (not merely standing on a furniture tile).
+-- In B42, isResting() is often only true briefly while entering a bed/chair; settled
+-- sit/lie states use isSittingOnFurniture() / getBed() instead.
+function BetterResting.isPlayerResting(player)
+    if not player then
+        return false
+    end
+    if player.isResting and player:isResting() then
+        return true
+    end
+    if player.isSittingOnFurniture and player:isSittingOnFurniture() then
+        return true
+    end
+    if player.getBed and player:getBed() then
+        return true
+    end
+    if player.isSitOnGround and player:isSitOnGround() then
+        return true
+    end
+    return false
+end
+
 function BetterResting.isActuallyVehicle(player)
     local vehicle = player:getVehicle()
     if vehicle then
@@ -127,190 +215,115 @@ function BetterResting.isActuallyVehicle(player)
 end
 
 function BetterResting.isActuallyBed(player)
-    local bed = nil
-    if player.getBed then
-        bed = player:getBed()
-        if bed then
-            local isActuallyBed = false
-            if bed.getSprite then
-                local sprite = bed:getSprite()
-                if sprite then
-                    local spriteName = sprite:getName()
-                    if spriteName then
-                        local spriteNameLower = tostring(spriteName):lower()
-                        
-                        if spriteNameLower:find("seating") or 
-                           spriteNameLower:find("chair") or 
-                           spriteNameLower:find("sofa") or 
-                           spriteNameLower:find("couch") or
-                           spriteNameLower:find("stool") or
-                           spriteNameLower:find("bench") or
-                           spriteNameLower:find("seat") then
-                            bed = nil 
-                        elseif spriteNameLower:find("bed") or 
-                               spriteNameLower:find("bedding") or 
-                               spriteNameLower:find("sleeping") or
-                               spriteNameLower:find("tent") or
-                               spriteNameLower:find("cot") or
-                               spriteNameLower:find("gurney") or
-                               spriteNameLower:find("camping_") then  
-                            isActuallyBed = true
-                        end
-                    end
-                end
-            end
-            
-            if bed and not isActuallyBed and bed.getCustomItem then
-                local customItem = bed:getCustomItem()
-                if customItem then
-                    local customItemStr = nil
-                    if type(customItem) == "string" then
-                        customItemStr = customItem
-                    elseif customItem.getType then
-                        customItemStr = customItem:getType()
-                    elseif customItem.getFullType then
-                        customItemStr = customItem:getFullType()
-                    end
-                    
-                    if customItemStr and BetterResting.BedCustomItems[customItemStr] then
-                        isActuallyBed = true
-                    else
+    if not player or not player.getBed then
+        return nil
+    end
 
-                    end
-                end
-            end
-            
-            if bed and not isActuallyBed then
-                bed = nil
-                    end
-                end
-            end
-            
-    if bed then
+    local bed = player:getBed()
+    if not bed then
+        return nil
+    end
+
+    local spriteName = getObjectSpriteName(bed)
+    if spriteName then
+        local spriteNameLower = spriteName:lower()
+
+        -- getBed() can briefly point at seating; reject clear chairs/sofas
+        if spriteNameLooksLikeSeating(spriteNameLower) and not spriteNameLooksLikeBed(spriteNameLower) then
+            return nil
+        end
+
+        if BetterResting.BedSprites and BetterResting.BedSprites[spriteName] then
+            return BetterResting.RestType.BED
+        end
+        if spriteNameLooksLikeBed(spriteNameLower) then
+            return BetterResting.RestType.BED
+        end
+    end
+
+    local customItemStr = getObjectCustomItemStr(bed)
+    if customItemStr and BetterResting.BedCustomItems and BetterResting.BedCustomItems[customItemStr] then
         return BetterResting.RestType.BED
     end
-    
-    return nil  
+
+    if objectHasBedProperty(bed) then
+        return BetterResting.RestType.BED
+    end
+
+    -- Trust getBed() when we cannot positively identify seating
+    return BetterResting.RestType.BED
 end
 
 function BetterResting.isActuallyChair(player)
-    local isSittingOnFurniture = false
-    if player.isSittingOnFurniture then
-        isSittingOnFurniture = player:isSittingOnFurniture()
-    else
+    if not player or not player.isSittingOnFurniture or not player:isSittingOnFurniture() then
+        return nil
     end
-    
-    if isSittingOnFurniture then
-        local furnitureObj = nil
-        if player.getSitOnFurnitureObject then
-            furnitureObj = player:getSitOnFurnitureObject()
-            
-            if furnitureObj then
-                local isSeatingFurniture = false
-                local isBedObject = false
-                
-                if furnitureObj.getSprite then
-                    local sprite = furnitureObj:getSprite()
-                    if sprite then
-                        local spriteName = sprite:getName()
-                        if spriteName then
-                            local spriteNameLower = tostring(spriteName):lower()
-                            
-                            if spriteNameLower:find("seating") or 
-                               spriteNameLower:find("chair") or 
-                               spriteNameLower:find("sofa") or 
-                               spriteNameLower:find("couch") or
-                               spriteNameLower:find("stool") or
-                               spriteNameLower:find("bench") or
-                               spriteNameLower:find("seat") then
-                                isSeatingFurniture = true
-                            elseif spriteNameLower:find("bed") or 
-                                   spriteNameLower:find("bedding") or 
-                                   spriteNameLower:find("sleeping") then
-                                isBedObject = true
-                end
-            end
-                    end
-                end
-                
-                if not isSeatingFurniture and not isBedObject and furnitureObj.getCustomItem then
-                    local customItem = furnitureObj:getCustomItem()
-                    if customItem then
-                        local customItemStr = nil
-                        if type(customItem) == "string" then
-                            customItemStr = customItem
-                        elseif customItem.getType then
-                            customItemStr = customItem:getType()
-                        elseif customItem.getFullType then
-                            customItemStr = customItem:getFullType()
-                        end
-                        
-                        if customItemStr then
-                            if BetterResting.BedCustomItems[customItemStr] then
-                                isBedObject = true
-                        end
-                    end
-                end
-            end
-            
-                if not isSeatingFurniture and not isBedObject then
-                    if furnitureObj.getProperties then
-                        local props = furnitureObj:getProperties()
-                        if props then
-                            if props:get("bed") or props:get("BedType") then
-                                isBedObject = true
 
-                            end
-                        end
-                    end
-                    if furnitureObj.bed or furnitureObj.BedType then
-                        isBedObject = true
-                end
+    local furnitureObj = nil
+    if player.getSitOnFurnitureObject then
+        furnitureObj = player:getSitOnFurnitureObject()
+    end
+
+    if furnitureObj then
+        local spriteName = getObjectSpriteName(furnitureObj)
+        if spriteName then
+            local spriteNameLower = spriteName:lower()
+
+            if BetterResting.BedSprites and BetterResting.BedSprites[spriteName] then
+                return BetterResting.RestType.BED
             end
-            
-                if isBedObject then
-                    return BetterResting.RestType.BED
-                end
+            if BetterResting.ChairSprites and BetterResting.ChairSprites[spriteName] then
+                return BetterResting.RestType.CHAIR
+            end
+            if spriteNameLooksLikeBed(spriteNameLower) then
+                return BetterResting.RestType.BED
+            end
+            if spriteNameLooksLikeSeating(spriteNameLower) then
+                return BetterResting.RestType.CHAIR
             end
         end
-        
-        return BetterResting.RestType.CHAIR
+
+        local customItemStr = getObjectCustomItemStr(furnitureObj)
+        if customItemStr and BetterResting.BedCustomItems and BetterResting.BedCustomItems[customItemStr] then
+            return BetterResting.RestType.BED
+        end
+
+        if objectHasBedProperty(furnitureObj) then
+            return BetterResting.RestType.BED
+        end
     end
+
+    return BetterResting.RestType.CHAIR
 end
 
 function BetterResting.tileCheck(player)
     if not player then return nil end
-    
+
     local square = player:getCurrentSquare()
     if not square then return nil end
-    
+
     local objects = square:getObjects()
     if not objects then return nil end
-    
+
     for i = 0, objects:size() - 1 do
         local obj = objects:get(i)
-        if obj and obj.getSprite then
-            local sprite = obj:getSprite()
-            if sprite then
-                local spriteName = sprite:getName()
-                if spriteName then
-                    local spriteNameStr = tostring(spriteName)
-                    local restType = BetterResting.getRestTypeFromSprite(spriteNameStr)
-                    if restType then
-                        return restType
-                    end
-                end
+        local spriteName = getObjectSpriteName(obj)
+        if spriteName then
+            local restType = BetterResting.getRestTypeFromSprite(spriteName)
+            if restType then
+                return restType
             end
         end
     end
-    
+
     return nil
 end
 
 function BetterResting.detectRestType(player)
-    local isActuallyResting = BetterResting.isPlayerResting(player)
+    if not player then
+        return BetterResting.RestType.NOT_RESTING
+    end
 
-    --first check Method
     if BetterResting.isActuallyVehicle(player) == BetterResting.RestType.VEHICLE then
         return BetterResting.RestType.VEHICLE
     end
@@ -319,22 +332,24 @@ function BetterResting.detectRestType(player)
         return BetterResting.RestType.NOT_RESTING
     end
 
-    if isActuallyResting then
-        local bedResult = BetterResting.isActuallyBed(player)
-        if bedResult == BetterResting.RestType.BED then
-            return BetterResting.RestType.BED
-        end
+    -- Prefer furniture/bed APIs first. These stay true after sit/lie settles,
+    -- while isResting() often only covers the enter animation (~1-2s).
+    local bedResult = BetterResting.isActuallyBed(player)
+    if bedResult == BetterResting.RestType.BED then
+        return BetterResting.RestType.BED
+    end
 
-        local chairResult = BetterResting.isActuallyChair(player)
-        if chairResult == BetterResting.RestType.CHAIR then
-            return BetterResting.RestType.CHAIR
-        elseif chairResult == BetterResting.RestType.BED then
-            return BetterResting.RestType.BED
-        end
+    local chairResult = BetterResting.isActuallyChair(player)
+    if chairResult == BetterResting.RestType.CHAIR then
+        return BetterResting.RestType.CHAIR
+    elseif chairResult == BetterResting.RestType.BED then
+        return BetterResting.RestType.BED
+    end
 
-        if player:isSitOnGround() then
-            return BetterResting.RestType.FLOOR
-        end
+    -- Sprite / ground fallback only while in a real rest/sit state
+    -- (avoids standing-on-tile false positives)
+    if not BetterResting.isPlayerResting(player) then
+        return BetterResting.RestType.NOT_RESTING
     end
 
     local tileResult = BetterResting.tileCheck(player)
@@ -342,11 +357,10 @@ function BetterResting.detectRestType(player)
         return tileResult
     end
 
-    if not isActuallyResting then
-        return BetterResting.RestType.NOT_RESTING
+    if player.isSitOnGround and player:isSitOnGround() then
+        return BetterResting.RestType.FLOOR
     end
 
-    -- Final fallback
     return BetterResting.RestType.NOT_RESTING
 end
 
@@ -394,7 +408,7 @@ function bedRestingStiffness:new(character)
             end
         end
         
-        if o.bodyPartsModified and isServer() then
+        if o.bodyPartsModified and (isServer() or not isClient()) then
             if bodyDamage.Update then
                 bodyDamage:Update()
             end
@@ -531,7 +545,7 @@ function bedWoundHealing:new(character)
             end
         end
         
-        if o.bodyPartsModified and isServer() then
+        if o.bodyPartsModified and (isServer() or not isClient()) then
             if bodyDamage.Update then
                 bodyDamage:Update()
             end
@@ -548,19 +562,4 @@ Events.OnTick.Add(function()
     BetterResting:onTick()
 end)
 
-if isClient() and not isServer() then
-    Events.OnPlayerUpdate.Add(function(player)
-        if not player then return end
-        
-        local restType = BetterResting.detectRestType(player)
-        if restType == BetterResting.RestType.BED then
-            sendClientCommand(player, "BetterResting", "ProcessBedResting", {})
-            sendClientCommand(player, "BetterResting", "ReduceStiffness", {})
-            sendClientCommand(player, "BetterResting", "HealWounds", {})
-        elseif restType == BetterResting.RestType.CHAIR then
-            sendClientCommand(player, "BetterResting", "ProcessChairResting", {})
-        elseif restType == BetterResting.RestType.VEHICLE then
-            sendClientCommand(player, "BetterResting", "ProcessVehicleResting", {})
-        end
-    end)
-end
+-- Mechanics are server-driven (SP + dedicated/listen). Clients only handle UI.

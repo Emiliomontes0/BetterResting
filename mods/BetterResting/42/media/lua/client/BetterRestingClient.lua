@@ -11,7 +11,12 @@ local clientBuffData = {
 }
 
 local hasShownInitialMessage = false
-local confirmationTimer = 0
+
+local function applySyncedBuffState(active, endTime)
+    BetterResting.ClientBuffData = BetterResting.ClientBuffData or {}
+    BetterResting.ClientBuffData.chairBuffActive = active and true or false
+    BetterResting.ClientBuffData.chairBuffEndTime = endTime or 0
+end
 
 local function showBuffMessage(buffType, duration, buffEndTime)
     if buffType == "chair" then
@@ -50,26 +55,20 @@ local restMessageData = {
 local updateCounter = 0
 Events.OnPlayerUpdate.Add(function(player)
     if not player then return end
-    
+
+    -- UI-only on pure clients; host/SP also run server mechanics separately
     updateCounter = updateCounter + 1
-    
-    if not hasShownInitialMessage then
-        confirmationTimer = confirmationTimer + 1
-        if confirmationTimer >= 60 then
-            showModConfirmation()
-        end
-    end
-    
+
     local restType = BetterResting.detectRestType(player)
-    
+
     if not BetterResting.ClientBuffData then
         BetterResting.ClientBuffData = {}
     end
-    
+
     local serverBuffActive = BetterResting.ClientBuffData.chairBuffActive or false
     local serverBuffEndTime = BetterResting.ClientBuffData.chairBuffEndTime or 0
     local wasBuffActive = clientBuffData.chairBuffActive
-    
+
     if serverBuffActive then
         local calendar = Calendar.getInstance()
         local currentTimeMinutes = 0
@@ -78,9 +77,9 @@ Events.OnPlayerUpdate.Add(function(player)
         else
             currentTimeMinutes = BetterResting.getCurrentGameHours() * 60
         end
-        
+
         local endTime = serverBuffEndTime
-        
+
         if not wasBuffActive and endTime > 0 then
             if endTime > currentTimeMinutes then
                 local remaining = endTime - currentTimeMinutes
@@ -88,17 +87,17 @@ Events.OnPlayerUpdate.Add(function(player)
                 showBuffMessage("chair", remainingMinutes, endTime)
             end
         end
-        
+
         if wasBuffActive and endTime > 0 and currentTimeMinutes >= endTime then
             showBuffExpired("chair")
         end
-        
+
         clientBuffData.chairBuffActive = serverBuffActive
     elseif wasBuffActive then
         showBuffExpired("chair")
         clientBuffData.chairBuffActive = false
     end
-    
+
     if restType ~= lastRestType and restType ~= BetterResting.RestType.FLOOR then
         if BetterResting.Config.ShowMessages then
             local messages = {
@@ -106,7 +105,7 @@ Events.OnPlayerUpdate.Add(function(player)
                 [BetterResting.RestType.VEHICLE] = "Resting in vehicle - Maximum stamina recovery",
                 [BetterResting.RestType.BED] = "Resting in bed - Wounds and muscle strain",
             }
-            
+
             if messages[restType] then
                 restMessageData.startTick = updateCounter
                 restMessageData.message = messages[restType]
@@ -115,7 +114,7 @@ Events.OnPlayerUpdate.Add(function(player)
             end
         end
     end
-    
+
     if restType ~= BetterResting.RestType.FLOOR then
         if BetterResting.Config.ShowMessages then
             local messages = {
@@ -123,11 +122,11 @@ Events.OnPlayerUpdate.Add(function(player)
                 [BetterResting.RestType.VEHICLE] = "Resting in vehicle - Maximum stamina recovery",
                 [BetterResting.RestType.BED] = "Resting in bed - Wounds and muscle strain",
             }
-            
+
             local currentMessage = messages[restType]
             if currentMessage then
                 restMessageData.message = currentMessage
-                
+
                 local elapsed = updateCounter - restMessageData.startTick
                 if elapsed < restMessageData.duration then
                     if updateCounter - restMessageData.lastRefresh >= restMessageData.refreshInterval then
@@ -144,21 +143,27 @@ Events.OnPlayerUpdate.Add(function(player)
     else
         restMessageData.message = nil
     end
-    
-    if restType == BetterResting.RestType.FLOOR then
-        lastStaminaCheck = updateCounter
-    end
-    
+
     lastRestType = restType
-    
+
     if clientBuffData.chairBuffActive and BetterResting.Config.ShowMessages then
         local currentTime = Calendar.getInstance():getTimeInMillis() / 1000
         local timeSinceLastIndicator = currentTime - clientBuffData.lastIndicatorTime
-        
+
         if timeSinceLastIndicator >= clientBuffData.indicatorInterval then
             HaloTextHelper.addTextWithArrow(player, "I feel well rested", true, 0, 255, 0)
             clientBuffData.lastIndicatorTime = currentTime
         end
+    end
+end)
+
+-- Receive Well Rested buff state from server (MP / listen host)
+Events.OnServerCommand.Add(function(module, command, args)
+    if module ~= "BetterResting" then
+        return
+    end
+    if command == "SyncChairBuff" then
+        applySyncedBuffState(args and args.active, args and args.endTime)
     end
 end)
 
@@ -169,10 +174,15 @@ end
 local function initBetterResting()
     local player = getPlayer()
     if not player then return end
-    
+
     if not hasShownInitialMessage and BetterResting.Config.ShowMessages then
         HaloTextHelper.addTextWithArrow(player, "BetterResting Mod Loaded!", true, 0, 255, 0)
         hasShownInitialMessage = true
+    end
+
+    -- Ask server for current buff state after join/load (no-op in pure SP authority path)
+    if isClient() then
+        sendClientCommand(player, "BetterResting", "RequestChairBuffSync", {})
     end
 end
 
@@ -191,21 +201,10 @@ function BetterRestingTest.showMessage(msg)
 end
 
 function BetterRestingTest.checkMod()
-    if BetterResting then
-    end
-    
     local player = getPlayer()
-    if player then
-        if BetterResting then
-            local restType = BetterResting.detectRestType(player)
-        end
-        
-        if BetterResting and BetterResting.ClientBuffData then
-            if BetterResting.ClientBuffData.chairBuffActive then
-            end
-        end
+    if player and BetterResting then
+        BetterResting.detectRestType(player)
     end
-    
     return true
 end
 
@@ -214,14 +213,17 @@ function BetterRestingTest.checkBuff()
     if not player then
         return
     end
-    
+
     if BetterResting and BetterResting.ClientBuffData and BetterResting.Config.ShowMessages then
         if BetterResting.ClientBuffData.chairBuffActive then
-            local currentHours = BetterResting.getCurrentGameHours()
-            local endTime = BetterResting.ClientBuffData.chairBuffEndTime
-            local remaining = endTime - currentHours
-            local remainingMinutes = math.floor(remaining * 60)
-            
+            local calendar = Calendar.getInstance()
+            local currentTimeMinutes = 0
+            if calendar then
+                currentTimeMinutes = calendar:getTimeInMillis() / (1000 * 60)
+            end
+            local endTime = BetterResting.ClientBuffData.chairBuffEndTime or 0
+            local remainingMinutes = math.floor(endTime - currentTimeMinutes)
+
             local message = "Well Rested buff active! " .. remainingMinutes .. " min remaining"
             HaloTextHelper.addTextWithArrow(player, message, true, 0, 255, 0)
         else
@@ -231,5 +233,3 @@ function BetterRestingTest.checkBuff()
 end
 
 Events.OnGameStart.Add(initBetterResting)
-Events.OnGameStart.Add(initBetterResting)
-
