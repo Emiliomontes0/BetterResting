@@ -37,10 +37,10 @@ option BetterResting.BedStaminaRegenMultiplier
 	page = BetterRestingBed, translation = BetterResting_BedStaminaRegenMultiplier,
 }
 
-option BetterResting.BedHPRegenMultiplier
+option BetterResting.BedInjuryRegenMultiplier
 {
 	type = double, min = 0.5, max = 10.0, default = 2.0,
-	page = BetterRestingBed, translation = BetterResting_BedHPRegenMultiplier,
+	page = BetterRestingBed, translation = BetterResting_BedInjuryRegenMultiplier,
 }
 
 option BetterResting.BedMuscleFatigueReduction

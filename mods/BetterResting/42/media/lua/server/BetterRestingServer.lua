@@ -7,7 +7,6 @@ BetterResting.Server = BetterResting.Server or {}
 BetterResting.Server.playerRestData = {}
 BetterResting.Server.updateCounter = 0
 
--- Thin legacy command table (kept for compatibility; mechanics are server-driven)
 BetterResting.Server.Commands = {}
 BetterResting.Server.Commands.BetterResting = {}
 
@@ -38,6 +37,53 @@ local function getCurrentTimeMinutes()
     return BetterResting.getCurrentGameHours() * 60
 end
 
+local function getEnduranceStatId()
+    if not CharacterStat then
+        return nil
+    end
+    return CharacterStat.ENDURANCE or CharacterStat.Endurance
+end
+
+-- B42.13+ MP: server stat writes must be synced or clients keep vanilla values
+local function syncEndurance(player)
+    if not player or not isServer() then
+        return
+    end
+    local statId = getEnduranceStatId()
+    if syncPlayerStats and statId then
+        syncPlayerStats(player, statId)
+    end
+end
+
+local function readEndurance(stats)
+    if not stats then
+        return nil
+    end
+    local statId = getEnduranceStatId()
+    if statId and stats.get then
+        local value = stats:get(statId)
+        if value ~= nil then
+            return value
+        end
+    end
+    if stats.getEndurance then
+        return stats:getEndurance()
+    end
+    return nil
+end
+
+local function writeEndurance(player, stats, value)
+    local statId = getEnduranceStatId()
+    if statId and stats.set then
+        stats:set(statId, value)
+    elseif stats.setEndurance then
+        stats:setEndurance(value)
+    else
+        return
+    end
+    syncEndurance(player)
+end
+
 function BetterResting.Server:initPlayerData(player)
     local key = getPlayerKey(player)
     if not key then
@@ -62,17 +108,14 @@ function BetterResting.Server:initPlayerData(player)
     local data = self.playerRestData[key]
     if not data.lastStaminaLevel then
         local stats = player:getStats()
-        if stats then
-            local stamina = stats:get(CharacterStat.ENDURANCE)
-            if stamina then
-                data.lastStaminaLevel = stamina
-            end
+        local stamina = readEndurance(stats)
+        if stamina then
+            data.lastStaminaLevel = stamina
         end
     end
     return data
 end
 
--- Push Well Rested buff state to the owning client (or local SP UI table)
 function BetterResting.Server:syncChairBuffToClient(player, data, force)
     if not player or not data then
         return
@@ -98,7 +141,6 @@ function BetterResting.Server:syncChairBuffToClient(player, data, force)
     if isServer() then
         sendServerCommand(player, "BetterResting", "SyncChairBuff", args)
     else
-        -- Singleplayer: same Lua VM, write directly for client UI
         BetterResting.ClientBuffData = BetterResting.ClientBuffData or {}
         BetterResting.ClientBuffData.chairBuffActive = active
         BetterResting.ClientBuffData.chairBuffEndTime = endTime
@@ -109,7 +151,7 @@ function BetterResting.Server:applyChairBuff(player, data)
     local stats = player:getStats()
     if not stats then return end
 
-    local stamina = stats:get(CharacterStat.ENDURANCE)
+    local stamina = readEndurance(stats)
     if not stamina then return end
 
     if stamina >= 0.99 and not data.wasFullStamina then
@@ -134,14 +176,14 @@ function BetterResting.Server:processChairResting(player, data, updateCounter)
     local stats = player:getStats()
     if not stats then return end
 
-    local stamina = stats:get(CharacterStat.ENDURANCE)
+    local stamina = readEndurance(stats)
     if not stamina then return end
 
     if stamina < 1.0 then
         local baseRegen = 0.001
         local bonusRegen = baseRegen * (BetterResting.Config.ChairStaminaRegenMultiplier - 1.0)
         local newStamina = math.min(1.0, stamina + bonusRegen)
-        stats:set(CharacterStat.ENDURANCE, newStamina)
+        writeEndurance(player, stats, newStamina)
     end
 
     self:applyChairBuff(player, data)
@@ -151,14 +193,14 @@ function BetterResting.Server:processVehicleResting(player, data, updateCounter)
     local stats = player:getStats()
     if not stats then return end
 
-    local stamina = stats:get(CharacterStat.ENDURANCE)
+    local stamina = readEndurance(stats)
     if not stamina then return end
 
     if stamina < 1.0 then
         local baseRegen = 0.001
         local bonusRegen = baseRegen * (BetterResting.Config.VehicleStaminaRegenMultiplier - 1.0)
         local newStamina = math.min(1.0, stamina + bonusRegen)
-        stats:set(CharacterStat.ENDURANCE, newStamina)
+        writeEndurance(player, stats, newStamina)
     end
 end
 
@@ -166,7 +208,7 @@ function BetterResting.Server:applyVehicleStaminaReduction(player, data)
     local stats = player:getStats()
     if not stats then return end
 
-    local stamina = stats:get(CharacterStat.ENDURANCE)
+    local stamina = readEndurance(stats)
     if not stamina then return end
 
     if data.lastStaminaLevel and stamina < data.lastStaminaLevel then
@@ -174,7 +216,7 @@ function BetterResting.Server:applyVehicleStaminaReduction(player, data)
         local refund = staminaLost * (1.0 - BetterResting.Config.VehicleStaminaConsumptionReduction)
         if refund > 0 then
             local newStamina = math.min(1.0, stamina + refund)
-            stats:set(CharacterStat.ENDURANCE, newStamina)
+            writeEndurance(player, stats, newStamina)
             data.lastStaminaLevel = newStamina
             return
         end
@@ -184,25 +226,25 @@ function BetterResting.Server:applyVehicleStaminaReduction(player, data)
 end
 
 function BetterResting.Server:processBedRestingStiffness(player, updateCounter)
-    bedRestingStiffness:new(player)
+    bedRestingStiffness:new(player, true)
 end
 
 function BetterResting.Server:processBedStaminaRegen(player, data, updateCounter)
     local stats = player:getStats()
     if not stats then return end
 
-    local stamina = stats:get(CharacterStat.ENDURANCE)
+    local stamina = readEndurance(stats)
     if stamina and stamina < 1.0 then
         local baseRegen = 0.001
         local bonusRegen = baseRegen * (BetterResting.Config.BedStaminaRegenMultiplier - 1.0)
         local newStamina = math.min(1.0, stamina + bonusRegen)
-        stats:set(CharacterStat.ENDURANCE, newStamina)
+        writeEndurance(player, stats, newStamina)
     end
 end
 
 function BetterResting.Server:processBedResting(player, data, updateCounter)
     self:processBedStaminaRegen(player, data, updateCounter)
-    bedWoundHealing:new(player)
+    bedWoundHealing:new(player, true)
     self:processBedRestingStiffness(player, updateCounter)
 end
 
@@ -226,7 +268,7 @@ function BetterResting.Server:applyChairBuffEffect(player, data)
     local stats = player:getStats()
     if not stats then return end
 
-    local stamina = stats:get(CharacterStat.ENDURANCE)
+    local stamina = readEndurance(stats)
     if not stamina then return end
 
     if data.lastStaminaLevel and stamina < data.lastStaminaLevel then
@@ -234,7 +276,7 @@ function BetterResting.Server:applyChairBuffEffect(player, data)
         local refund = staminaLost * (1.0 - BetterResting.Config.ChairStaminaConsumptionReduction)
         if refund > 0 then
             local newStamina = math.min(1.0, stamina + refund)
-            stats:set(CharacterStat.ENDURANCE, newStamina)
+            writeEndurance(player, stats, newStamina)
             data.lastStaminaLevel = newStamina
             return
         end
@@ -243,40 +285,43 @@ function BetterResting.Server:applyChairBuffEffect(player, data)
     data.lastStaminaLevel = stamina
 end
 
-function BetterResting.Server:onPlayerUpdate(player)
-    if not player then
+-- Track chair enter/exit when rest type changes (used by both SP loop and MP commands)
+function BetterResting.Server:onRestTypeChanged(player, data, restType)
+    if data.lastRestType == restType then
         return
     end
 
-    self.updateCounter = self.updateCounter + 1
-    local updateCounter = self.updateCounter
+    if restType == BetterResting.RestType.CHAIR then
+        data.chairRestStartTime = BetterResting.getCurrentGameHours()
+        local stats = player:getStats()
+        local stamina = readEndurance(stats)
+        if stamina then
+            data.chairRestStartStamina = stamina
+        end
+    elseif data.lastRestType == BetterResting.RestType.CHAIR then
+        data.chairRestStartTime = 0
+        data.chairRestStartStamina = 1.0
+        data.wasFullStamina = false
+    end
+
+    data.lastRestType = restType
+    data.currentRestType = restType
+end
+
+function BetterResting.Server:applyRestType(player, restType)
+    if not player then
+        return
+    end
 
     local data = self:initPlayerData(player)
     if not data then
         return
     end
 
-    local restType = BetterResting.detectRestType(player)
+    self.updateCounter = self.updateCounter + 1
+    local updateCounter = self.updateCounter
 
-    if data.lastRestType ~= restType then
-        if restType == BetterResting.RestType.CHAIR then
-            data.chairRestStartTime = BetterResting.getCurrentGameHours()
-            local stats = player:getStats()
-            if stats then
-                local stamina = stats:get(CharacterStat.ENDURANCE)
-                if stamina then
-                    data.chairRestStartStamina = stamina
-                end
-            end
-        elseif data.lastRestType == BetterResting.RestType.CHAIR then
-            data.chairRestStartTime = 0
-            data.chairRestStartStamina = 1.0
-            data.wasFullStamina = false
-        end
-    end
-
-    data.lastRestType = restType
-    data.currentRestType = restType
+    self:onRestTypeChanged(player, data, restType)
 
     if restType == BetterResting.RestType.CHAIR then
         self:processChairResting(player, data, updateCounter)
@@ -294,20 +339,71 @@ function BetterResting.Server:onPlayerUpdate(player)
     self:cleanupExpiredBuffs(player, data)
 end
 
--- Authority loop: singleplayer OR dedicated/listen server (not pure clients)
-if isServer() or not isClient() then
+-- Singleplayer only: same Lua VM, detect + apply locally.
+-- Multiplayer uses client commands below (furniture APIs are unreliable on dedicated).
+if not isServer() and not isClient() then
     Events.OnPlayerUpdate.Add(function(player)
-        BetterResting.Server:onPlayerUpdate(player)
+        if not player then
+            return
+        end
+        local restType = BetterResting.detectRestType(player)
+        BetterResting.Server:applyRestType(player, restType)
     end)
 end
 
--- Optional: clients can request a buff resync (e.g. after reconnect)
+-- MP: client detected chair rest → server applies bonus + syncs endurance
+local didLogChair = false
+function BetterResting.Server.Commands.BetterResting.ProcessChairResting(module, command, player, args)
+    if not player then return end
+    if not didLogChair then
+        didLogChair = true
+        print("BetterResting: MP chair resting active (multiplier=" ..
+            tostring(BetterResting.Config.ChairStaminaRegenMultiplier) .. ")")
+    end
+    BetterResting.Server:applyRestType(player, BetterResting.RestType.CHAIR)
+end
+
+function BetterResting.Server.Commands.BetterResting.ProcessVehicleResting(module, command, player, args)
+    if not player then return end
+    BetterResting.Server:applyRestType(player, BetterResting.RestType.VEHICLE)
+end
+
+function BetterResting.Server.Commands.BetterResting.ProcessBedResting(module, command, player, args)
+    if not player then return end
+    BetterResting.Server:applyRestType(player, BetterResting.RestType.BED)
+end
+
+function BetterResting.Server.Commands.BetterResting.ReduceStiffness(module, command, player, args)
+    if not player then return end
+    bedRestingStiffness:new(player, true)
+end
+
+function BetterResting.Server.Commands.BetterResting.HealWounds(module, command, player, args)
+    if not player then return end
+    bedWoundHealing:new(player, true)
+end
+
 function BetterResting.Server.Commands.BetterResting.RequestChairBuffSync(module, command, player, args)
     if not player then return end
     local data = BetterResting.Server:initPlayerData(player)
     if data then
         BetterResting.Server:syncChairBuffToClient(player, data, true)
     end
+end
+
+-- MP host also needs buff expiry / consumption refund while not actively sending rest commands
+if isServer() then
+    Events.OnPlayerUpdate.Add(function(player)
+        if not player then
+            return
+        end
+        local data = BetterResting.Server:initPlayerData(player)
+        if not data then
+            return
+        end
+        BetterResting.Server:applyChairBuffEffect(player, data)
+        BetterResting.Server:cleanupExpiredBuffs(player, data)
+    end)
 end
 
 Events.OnClientCommand.Add(function(module, command, player, args)

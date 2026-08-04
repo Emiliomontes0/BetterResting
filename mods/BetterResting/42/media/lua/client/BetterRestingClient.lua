@@ -53,13 +53,46 @@ local restMessageData = {
 }
 
 local updateCounter = 0
+
+local function isLocalPlayer(player)
+    if not player then
+        return false
+    end
+    if player.isLocalPlayer then
+        return player:isLocalPlayer()
+    end
+    local localPlayer = getPlayer()
+    return localPlayer ~= nil and player == localPlayer
+end
+
+-- B42: sendClientCommand(module, command, args) — do NOT pass player as first arg
+local function sendRestCommand(command)
+    sendClientCommand("BetterResting", command, {})
+end
+
+-- MP: client detects rest (APIs work locally), server applies bonuses + syncPlayerStats
+local function requestServerRestProcessing(player, restType)
+    if not isClient() or not player or not isLocalPlayer(player) then
+        return
+    end
+    if restType == BetterResting.RestType.CHAIR then
+        sendRestCommand("ProcessChairResting")
+    elseif restType == BetterResting.RestType.VEHICLE then
+        sendRestCommand("ProcessVehicleResting")
+    elseif restType == BetterResting.RestType.BED then
+        sendRestCommand("ProcessBedResting")
+        sendRestCommand("ReduceStiffness")
+        sendRestCommand("HealWounds")
+    end
+end
+
 Events.OnPlayerUpdate.Add(function(player)
     if not player then return end
 
-    -- UI-only on pure clients; host/SP also run server mechanics separately
     updateCounter = updateCounter + 1
 
     local restType = BetterResting.detectRestType(player)
+    requestServerRestProcessing(player, restType)
 
     if not BetterResting.ClientBuffData then
         BetterResting.ClientBuffData = {}
@@ -182,7 +215,7 @@ local function initBetterResting()
 
     -- Ask server for current buff state after join/load (no-op in pure SP authority path)
     if isClient() then
-        sendClientCommand(player, "BetterResting", "RequestChairBuffSync", {})
+        sendClientCommand("BetterResting", "RequestChairBuffSync", {})
     end
 end
 

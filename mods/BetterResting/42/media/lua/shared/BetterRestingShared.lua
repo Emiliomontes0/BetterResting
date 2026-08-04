@@ -19,7 +19,7 @@ BetterResting.Config = {
     
     -- Bed bonuses
     BedStaminaRegenMultiplier = 1.2,          -- 20% faster stamina regen in bed
-    BedHPRegenMultiplier = 2.0,               -- Matches sandbox default; gradual wound healing speed
+    BedInjuryRegenMultiplier = 2.0,           -- Matches sandbox default; treated-injury healing assist
     BedMuscleFatigueReduction = 0.30,         -- 30% faster muscle fatigue recovery (increased from 15%)
     
     -- UI settings
@@ -42,49 +42,51 @@ function BetterResting:buildOptions()
 end
 
 function BetterResting:syncOptions()
-    local sandboxOptions = SandboxOptions.getInstance()
-    if not sandboxOptions then
-        return
-    end
-    
-    -- Helper function to safely get option value
-    local function getOptionValue(optionName)
+    -- Prefer SandboxVars (correct in MP). Fall back to SandboxOptions API.
+    local vars = SandboxVars and SandboxVars.BetterResting or nil
+
+    local function getOptionValue(fieldName, optionName)
+        if vars and vars[fieldName] ~= nil then
+            return vars[fieldName]
+        end
+        local sandboxOptions = SandboxOptions.getInstance and SandboxOptions.getInstance()
+            or (getSandboxOptions and getSandboxOptions())
+        if not sandboxOptions then
+            return nil
+        end
         local option = sandboxOptions:getOptionByName(optionName)
         if option then
             return option:getValue()
         end
         return nil
     end
-    
-    -- Chair/Sofa bonuses
-    local chairStaminaRegen = getOptionValue("BetterResting.ChairStaminaRegenMultiplier")
+
+    local chairStaminaRegen = getOptionValue("ChairStaminaRegenMultiplier", "BetterResting.ChairStaminaRegenMultiplier")
     if chairStaminaRegen then self.Config.ChairStaminaRegenMultiplier = chairStaminaRegen end
-    
-    local chairBuffDuration = getOptionValue("BetterResting.ChairBuffDuration")
+
+    local chairBuffDuration = getOptionValue("ChairBuffDuration", "BetterResting.ChairBuffDuration")
     if chairBuffDuration then self.Config.ChairBuffDuration = chairBuffDuration end
-    
-    local chairStaminaConsumption = getOptionValue("BetterResting.ChairStaminaConsumptionReduction")
+
+    local chairStaminaConsumption = getOptionValue("ChairStaminaConsumptionReduction", "BetterResting.ChairStaminaConsumptionReduction")
     if chairStaminaConsumption then self.Config.ChairStaminaConsumptionReduction = chairStaminaConsumption end
-    
-    -- Vehicle bonuses
-    local vehicleStaminaRegen = getOptionValue("BetterResting.VehicleStaminaRegenMultiplier")
+
+    local vehicleStaminaRegen = getOptionValue("VehicleStaminaRegenMultiplier", "BetterResting.VehicleStaminaRegenMultiplier")
     if vehicleStaminaRegen then self.Config.VehicleStaminaRegenMultiplier = vehicleStaminaRegen end
-    
-    local vehicleStaminaConsumption = getOptionValue("BetterResting.VehicleStaminaConsumptionReduction")
+
+    local vehicleStaminaConsumption = getOptionValue("VehicleStaminaConsumptionReduction", "BetterResting.VehicleStaminaConsumptionReduction")
     if vehicleStaminaConsumption then self.Config.VehicleStaminaConsumptionReduction = vehicleStaminaConsumption end
-    
-    -- Bed bonuses
-    local bedStaminaRegen = getOptionValue("BetterResting.BedStaminaRegenMultiplier")
+
+    local bedStaminaRegen = getOptionValue("BedStaminaRegenMultiplier", "BetterResting.BedStaminaRegenMultiplier")
     if bedStaminaRegen then self.Config.BedStaminaRegenMultiplier = bedStaminaRegen end
-    
-    local bedHPRegen = getOptionValue("BetterResting.BedHPRegenMultiplier")
-    if bedHPRegen then self.Config.BedHPRegenMultiplier = bedHPRegen end
-    
-    local bedMuscleFatigue = getOptionValue("BetterResting.BedMuscleFatigueReduction")
+
+    local bedInjuryRegen = getOptionValue("BedInjuryRegenMultiplier", "BetterResting.BedInjuryRegenMultiplier")
+        or getOptionValue("BedHPRegenMultiplier", "BetterResting.BedHPRegenMultiplier") -- legacy key
+    if bedInjuryRegen then self.Config.BedInjuryRegenMultiplier = bedInjuryRegen end
+
+    local bedMuscleFatigue = getOptionValue("BedMuscleFatigueReduction", "BetterResting.BedMuscleFatigueReduction")
     if bedMuscleFatigue then self.Config.BedMuscleFatigueReduction = bedMuscleFatigue end
-    
-    -- UI settings (boolean)
-    local showMessages = getOptionValue("BetterResting.ShowMessages")
+
+    local showMessages = getOptionValue("ShowMessages", "BetterResting.ShowMessages")
     if showMessages ~= nil then self.Config.ShowMessages = showMessages end
 end
 
@@ -368,15 +370,18 @@ bedRestingStiffness = bedRestingStiffness or {}
 bedRestingStiffness.__index = bedRestingStiffness
 
 --- @param character IsoPlayer The player character object
+--- @param forceBed boolean|nil If true, skip detectRestType (server already resolved bed rest)
 --- @return table|nil The stiffness handler instance, or nil if not resting on bed
-function bedRestingStiffness:new(character)
+function bedRestingStiffness:new(character, forceBed)
     if not character then
         return nil
     end
     
-    local restType = BetterResting.detectRestType(character)
-    if restType ~= BetterResting.RestType.BED then
-        return nil  
+    if not forceBed then
+        local restType = BetterResting.detectRestType(character)
+        if restType ~= BetterResting.RestType.BED then
+            return nil  
+        end
     end
     
     -- Create instance
@@ -422,15 +427,18 @@ bedWoundHealing = bedWoundHealing or {}
 bedWoundHealing.__index = bedWoundHealing
 
 --- @param character IsoPlayer The player character object
+--- @param forceBed boolean|nil If true, skip detectRestType (server already resolved bed rest)
 --- @return table|nil The wound healing handler instance, or nil if not resting on bed
-function bedWoundHealing:new(character)
+function bedWoundHealing:new(character, forceBed)
     if not character then
         return nil
     end
     
-    local restType = BetterResting.detectRestType(character)
-    if restType ~= BetterResting.RestType.BED then
-        return nil  
+    if not forceBed then
+        local restType = BetterResting.detectRestType(character)
+        if restType ~= BetterResting.RestType.BED then
+            return nil  
+        end
     end
     
     -- Create instance
@@ -449,7 +457,7 @@ function bedWoundHealing:new(character)
     local bodyParts = bodyDamage:getBodyParts()
     if bodyParts then
         -- Base reduction rate per update (matching old working code)
-        local reduction = 0.001 * BetterResting.Config.BedHPRegenMultiplier
+        local reduction = 0.001 * BetterResting.Config.BedInjuryRegenMultiplier
         
         -- Use same loop structure as old code (1 to size, get(i-1))
         for i = 1, bodyParts:size() do
@@ -562,4 +570,7 @@ Events.OnTick.Add(function()
     BetterResting:onTick()
 end)
 
--- Mechanics are server-driven (SP + dedicated/listen). Clients only handle UI.
+-- Mechanics:
+-- SP: server OnPlayerUpdate detects + applies
+-- MP: client detects, sendClientCommand Process*; server applies + syncPlayerStats
+-- Sandbox: prefer SandboxVars.BetterResting.* (required for MP config)
