@@ -1,52 +1,59 @@
 Sandbox_EN = {
-    -- Pages
+    -- B42.20+ prefers Sandbox.json; this .txt is kept as a fallback for older loaders.
+    -- Keys use Sandbox_ + translation= value from sandbox-options.txt
+
     Sandbox_BetterRestingChair = "Better Resting - Chair",
     Sandbox_BetterRestingVehicle = "Better Resting - Vehicle",
     Sandbox_BetterRestingBed = "Better Resting - Bed",
     Sandbox_BetterRestingUI = "Better Resting - UI",
 
-    -- Keep unprefixed keys too (matches translation= in sandbox-options.txt)
     BetterRestingChair = "Better Resting - Chair",
     BetterRestingVehicle = "Better Resting - Vehicle",
     BetterRestingBed = "Better Resting - Bed",
     BetterRestingUI = "Better Resting - UI",
 
-    -- =====================
-    -- Chair
-    -- =====================
+    Sandbox_BetterResting_ChairStaminaRegenMultiplier = "Chair stamina regen",
+    Sandbox_BetterResting_ChairStaminaRegenMultiplier_tooltip = "How much faster endurance recovers while sitting on furniture.<LINE><LINE>Anchor points:<LINE>0.5 = slower than vanilla<LINE>1.0 = no bonus (vanilla)<LINE>1.07 = default (+7%, mild)<LINE>1.5 = noticeably faster<LINE>2.0 = strong<LINE>3.0 = max<LINE><LINE>Higher = faster regen.",
     BetterResting_ChairStaminaRegenMultiplier = "Chair stamina regen",
-    BetterResting_ChairStaminaRegenMultiplier_tooltip = "How much faster endurance recovers while sitting on furniture. <LINE><LINE>1.0 = no bonus (vanilla) <LINE>1.07 = default (+7%, mild) <LINE>1.5 = noticeably faster <LINE>2.0 = roughly double bonus rate <LINE>3.0 = maximum (very strong) <LINE><LINE>0.5 = slower than vanilla (penalty).",
+    BetterResting_ChairStaminaRegenMultiplier_tooltip = "How much faster endurance recovers while sitting on furniture.<LINE><LINE>Anchor points:<LINE>0.5 = slower than vanilla<LINE>1.0 = no bonus (vanilla)<LINE>1.07 = default (+7%, mild)<LINE>1.5 = noticeably faster<LINE>2.0 = strong<LINE>3.0 = max<LINE><LINE>Higher = faster regen.",
 
+    Sandbox_BetterResting_ChairBuffDurationRealTime = "Well Rested buff duration",
+    Sandbox_BetterResting_ChairBuffDurationRealTime_tooltip = "How long Well Rested lasts after you fully recover endurance on a chair (real-time seconds).<LINE><LINE>Anchor points:<LINE>60 = 1 minute<LINE>600 = default (10 minutes)<LINE>1800 = 30 minutes<LINE>3600 = max (1 hour)<LINE><LINE>Higher = longer buff.<LINE>Only granted if you started resting below 75% endurance and then reached full.",
     BetterResting_ChairBuffDurationRealTime = "Well Rested buff duration",
-    BetterResting_ChairBuffDurationRealTime_tooltip = "How long the Well Rested buff lasts after you fully recover endurance on a chair (real-time seconds). <LINE><LINE>60 = 1 minute <LINE>600 = default (10 minutes) <LINE>1800 = 30 minutes <LINE>3600 = 1 hour <LINE><LINE>Buff is only granted if you started resting below 75% endurance and then reached full.",
+    BetterResting_ChairBuffDurationRealTime_tooltip = "How long Well Rested lasts after you fully recover endurance on a chair (real-time seconds).<LINE><LINE>Anchor points:<LINE>60 = 1 minute<LINE>600 = default (10 minutes)<LINE>1800 = 30 minutes<LINE>3600 = max (1 hour)<LINE><LINE>Higher = longer buff.<LINE>Only granted if you started resting below 75% endurance and then reached full.",
 
+    Sandbox_BetterResting_ChairStaminaConsumptionReduction = "Well Rested stamina drain",
+    Sandbox_BetterResting_ChairStaminaConsumptionReduction_tooltip = "While Well Rested is active, how much endurance drain is kept vs refunded.<LINE><LINE>Anchor points:<LINE>1.0 = no protection (full drain)<LINE>0.75 = default (~25% less drain)<LINE>0.5 = half drain<LINE>0.0 = max (no stamina loss)<LINE><LINE>Lower = stronger protection.",
     BetterResting_ChairStaminaConsumptionReduction = "Well Rested stamina drain",
-    BetterResting_ChairStaminaConsumptionReduction_tooltip = "While the Well Rested buff is active, how much endurance you keep when you would normally lose it. <LINE><LINE>1.0 = no protection (full drain) <LINE>0.75 = default (keep 75% of lost stamina / ~25% less drain) <LINE>0.5 = keep half of what you lose <LINE>0.0 = refund all drain (no stamina loss from actions) <LINE><LINE>Lower = stronger buff.",
+    BetterResting_ChairStaminaConsumptionReduction_tooltip = "While Well Rested is active, how much endurance drain is kept vs refunded.<LINE><LINE>Anchor points:<LINE>1.0 = no protection (full drain)<LINE>0.75 = default (~25% less drain)<LINE>0.5 = half drain<LINE>0.0 = max (no stamina loss)<LINE><LINE>Lower = stronger protection.",
 
-    -- =====================
-    -- Vehicle
-    -- =====================
+    Sandbox_BetterResting_VehicleStaminaRegenMultiplier = "Vehicle stamina regen",
+    Sandbox_BetterResting_VehicleStaminaRegenMultiplier_tooltip = "How much faster endurance recovers while sitting in a vehicle.<LINE><LINE>Anchor points:<LINE>0.5 = slower than vanilla<LINE>1.0 = no bonus (vanilla)<LINE>1.10 = default (+10%)<LINE>1.5 = noticeably faster<LINE>2.0 = strong<LINE>3.0 = max<LINE><LINE>Higher = faster regen.<LINE>Separate from the chair Well Rested buff.",
     BetterResting_VehicleStaminaRegenMultiplier = "Vehicle stamina regen",
-    BetterResting_VehicleStaminaRegenMultiplier_tooltip = "How much faster endurance recovers while sitting in a vehicle. <LINE><LINE>1.0 = no bonus (vanilla) <LINE>1.10 = default (+10%) <LINE>1.5 = noticeably faster <LINE>2.0 = strong <LINE>3.0 = maximum <LINE><LINE>0.5 = slower than vanilla. Separate from the chair Well Rested buff.",
+    BetterResting_VehicleStaminaRegenMultiplier_tooltip = "How much faster endurance recovers while sitting in a vehicle.<LINE><LINE>Anchor points:<LINE>0.5 = slower than vanilla<LINE>1.0 = no bonus (vanilla)<LINE>1.10 = default (+10%)<LINE>1.5 = noticeably faster<LINE>2.0 = strong<LINE>3.0 = max<LINE><LINE>Higher = faster regen.<LINE>Separate from the chair Well Rested buff.",
 
+    Sandbox_BetterResting_VehicleStaminaConsumptionReduction = "Vehicle stamina drain",
+    Sandbox_BetterResting_VehicleStaminaConsumptionReduction_tooltip = "While in a vehicle, how much endurance drain is kept vs refunded. Applies immediately (not a timed buff).<LINE><LINE>Anchor points:<LINE>1.0 = no protection (full drain)<LINE>0.5 = default (half drain)<LINE>0.25 = strong protection<LINE>0.0 = max (no stamina loss)<LINE><LINE>Lower = stronger protection.",
     BetterResting_VehicleStaminaConsumptionReduction = "Vehicle stamina drain",
-    BetterResting_VehicleStaminaConsumptionReduction_tooltip = "While in a vehicle, how much endurance you keep when you would normally lose it. Applies immediately in the vehicle (not a timed buff). <LINE><LINE>1.0 = no protection <LINE>0.5 = default (keep 50% of lost stamina / half drain) <LINE>0.25 = very strong protection <LINE>0.0 = no stamina loss in vehicle <LINE><LINE>Lower = stronger.",
+    BetterResting_VehicleStaminaConsumptionReduction_tooltip = "While in a vehicle, how much endurance drain is kept vs refunded. Applies immediately (not a timed buff).<LINE><LINE>Anchor points:<LINE>1.0 = no protection (full drain)<LINE>0.5 = default (half drain)<LINE>0.25 = strong protection<LINE>0.0 = max (no stamina loss)<LINE><LINE>Lower = stronger protection.",
 
-    -- =====================
-    -- Bed
-    -- =====================
+    Sandbox_BetterResting_BedStaminaRegenMultiplier = "Bed stamina regen",
+    Sandbox_BetterResting_BedStaminaRegenMultiplier_tooltip = "How much faster endurance recovers while resting in a bed, sleeping bag, or tent.<LINE><LINE>Anchor points:<LINE>0.5 = slower than vanilla<LINE>1.0 = no bonus (vanilla)<LINE>1.2 = default (+20%)<LINE>2.0 = strong<LINE>3.0 = max<LINE><LINE>Higher = faster regen.",
     BetterResting_BedStaminaRegenMultiplier = "Bed stamina regen",
-    BetterResting_BedStaminaRegenMultiplier_tooltip = "How much faster endurance recovers while resting in a bed / sleeping bag / tent. <LINE><LINE>1.0 = no bonus <LINE>1.2 = default (+20%) <LINE>2.0 = strong <LINE>3.0 = maximum <LINE><LINE>0.5 = slower than vanilla.",
+    BetterResting_BedStaminaRegenMultiplier_tooltip = "How much faster endurance recovers while resting in a bed, sleeping bag, or tent.<LINE><LINE>Anchor points:<LINE>0.5 = slower than vanilla<LINE>1.0 = no bonus (vanilla)<LINE>1.2 = default (+20%)<LINE>2.0 = strong<LINE>3.0 = max<LINE><LINE>Higher = faster regen.",
 
+    Sandbox_BetterResting_BedInjuryRegenMultiplier = "Bed injury regen",
+    Sandbox_BetterResting_BedInjuryRegenMultiplier_tooltip = "Speeds healing of treated injuries while resting in bed (bandaged/stitched wounds, stemmed bleeding, burns, stitches). Does not restore limb HP by itself.<LINE><LINE>Anchor points:<LINE>0.5 = weak assist<LINE>1.0 = mild<LINE>2.0 = default<LINE>5.0 = strong<LINE>10.0 = max<LINE><LINE>Higher = faster injury recovery.",
     BetterResting_BedInjuryRegenMultiplier = "Bed injury regen",
-    BetterResting_BedInjuryRegenMultiplier_tooltip = "Speeds up healing of treated injuries (bandaged/stitched wounds, bleeding that is stemmed, burns, stitches) while resting in bed. Does not restore limb HP by itself. <LINE><LINE>1.0 = mild assist <LINE>2.0 = default <LINE>5.0 = strong <LINE>10.0 = maximum <LINE><LINE>0.5 = weaker than default.",
+    BetterResting_BedInjuryRegenMultiplier_tooltip = "Speeds healing of treated injuries while resting in bed (bandaged/stitched wounds, stemmed bleeding, burns, stitches). Does not restore limb HP by itself.<LINE><LINE>Anchor points:<LINE>0.5 = weak assist<LINE>1.0 = mild<LINE>2.0 = default<LINE>5.0 = strong<LINE>10.0 = max<LINE><LINE>Higher = faster injury recovery.",
 
+    Sandbox_BetterResting_BedMuscleFatigueReduction = "Bed muscle strain recovery",
+    Sandbox_BetterResting_BedMuscleFatigueReduction_tooltip = "How quickly muscle stiffness / strain recovers while resting in bed.<LINE><LINE>Anchor points:<LINE>0.0 = no bonus<LINE>0.30 = default (moderate)<LINE>0.60 = strong<LINE>1.0 = max<LINE><LINE>Higher = faster strain recovery.",
     BetterResting_BedMuscleFatigueReduction = "Bed muscle strain recovery",
-    BetterResting_BedMuscleFatigueReduction_tooltip = "How quickly muscle stiffness / strain recovers while resting in bed. <LINE><LINE>0.0 = no bonus <LINE>0.30 = default (moderate) <LINE>0.60 = strong <LINE>1.0 = maximum <LINE><LINE>Higher = faster strain recovery.",
+    BetterResting_BedMuscleFatigueReduction_tooltip = "How quickly muscle stiffness / strain recovers while resting in bed.<LINE><LINE>Anchor points:<LINE>0.0 = no bonus<LINE>0.30 = default (moderate)<LINE>0.60 = strong<LINE>1.0 = max<LINE><LINE>Higher = faster strain recovery.",
 
-    -- =====================
-    -- UI
-    -- =====================
+    Sandbox_BetterResting_ShowMessages = "Show resting messages",
+    Sandbox_BetterResting_ShowMessages_tooltip = "Show floating text when resting, gaining Well Rested, or when the buff fades.",
     BetterResting_ShowMessages = "Show resting messages",
-    BetterResting_ShowMessages_tooltip = "Show floating text above your character when resting, gaining Well Rested, or when the buff fades.",
+    BetterResting_ShowMessages_tooltip = "Show floating text when resting, gaining Well Rested, or when the buff fades.",
 }

@@ -1,0 +1,33 @@
+{
+    "Sandbox_BetterRestingChair": "Better Resting - Chair",
+    "Sandbox_BetterRestingVehicle": "Better Resting - Vehicle",
+    "Sandbox_BetterRestingBed": "Better Resting - Bed",
+    "Sandbox_BetterRestingUI": "Better Resting - UI",
+
+    "Sandbox_BetterResting_ChairStaminaRegenMultiplier": "Chair stamina regen",
+    "Sandbox_BetterResting_ChairStaminaRegenMultiplier_tooltip": "How much faster endurance recovers while sitting on furniture.<LINE><LINE><RGB:0.8,0.8,0.8>Anchor points:<LINE>0.5 = slower than vanilla<LINE>1.0 = no bonus (vanilla)<LINE>1.07 = default (+7%, mild)<LINE>1.5 = noticeably faster<LINE>2.0 = strong<LINE>3.0 = max<LINE><LINE>Higher = faster regen.",
+
+    "Sandbox_BetterResting_ChairBuffDurationRealTime": "Well Rested buff duration",
+    "Sandbox_BetterResting_ChairBuffDurationRealTime_tooltip": "How long Well Rested lasts after you fully recover endurance on a chair (real-time seconds).<LINE><LINE><RGB:0.8,0.8,0.8>Anchor points:<LINE>60 = 1 minute<LINE>600 = default (10 minutes)<LINE>1800 = 30 minutes<LINE>3600 = max (1 hour)<LINE><LINE>Higher = longer buff.<LINE>Only granted if you started resting below 75% endurance and then reached full.",
+
+    "Sandbox_BetterResting_ChairStaminaConsumptionReduction": "Well Rested stamina drain",
+    "Sandbox_BetterResting_ChairStaminaConsumptionReduction_tooltip": "While Well Rested is active, how much endurance drain is kept vs refunded.<LINE><LINE><RGB:0.8,0.8,0.8>Anchor points:<LINE>1.0 = no protection (full drain)<LINE>0.75 = default (~25% less drain)<LINE>0.5 = half drain<LINE>0.0 = max (no stamina loss)<LINE><LINE>Lower = stronger protection.",
+
+    "Sandbox_BetterResting_VehicleStaminaRegenMultiplier": "Vehicle stamina regen",
+    "Sandbox_BetterResting_VehicleStaminaRegenMultiplier_tooltip": "How much faster endurance recovers while sitting in a vehicle.<LINE><LINE><RGB:0.8,0.8,0.8>Anchor points:<LINE>0.5 = slower than vanilla<LINE>1.0 = no bonus (vanilla)<LINE>1.10 = default (+10%)<LINE>1.5 = noticeably faster<LINE>2.0 = strong<LINE>3.0 = max<LINE><LINE>Higher = faster regen.<LINE>Separate from the chair Well Rested buff.",
+
+    "Sandbox_BetterResting_VehicleStaminaConsumptionReduction": "Vehicle stamina drain",
+    "Sandbox_BetterResting_VehicleStaminaConsumptionReduction_tooltip": "While in a vehicle, how much endurance drain is kept vs refunded. Applies immediately (not a timed buff).<LINE><LINE><RGB:0.8,0.8,0.8>Anchor points:<LINE>1.0 = no protection (full drain)<LINE>0.5 = default (half drain)<LINE>0.25 = strong protection<LINE>0.0 = max (no stamina loss)<LINE><LINE>Lower = stronger protection.",
+
+    "Sandbox_BetterResting_BedStaminaRegenMultiplier": "Bed stamina regen",
+    "Sandbox_BetterResting_BedStaminaRegenMultiplier_tooltip": "How much faster endurance recovers while resting in a bed, sleeping bag, or tent.<LINE><LINE><RGB:0.8,0.8,0.8>Anchor points:<LINE>0.5 = slower than vanilla<LINE>1.0 = no bonus (vanilla)<LINE>1.2 = default (+20%)<LINE>2.0 = strong<LINE>3.0 = max<LINE><LINE>Higher = faster regen.",
+
+    "Sandbox_BetterResting_BedInjuryRegenMultiplier": "Bed injury regen",
+    "Sandbox_BetterResting_BedInjuryRegenMultiplier_tooltip": "Speeds healing of treated injuries while resting in bed (bandaged/stitched wounds, stemmed bleeding, burns, stitches). Does not restore limb HP by itself.<LINE><LINE><RGB:0.8,0.8,0.8>Anchor points:<LINE>0.5 = weak assist<LINE>1.0 = mild<LINE>2.0 = default<LINE>5.0 = strong<LINE>10.0 = max<LINE><LINE>Higher = faster injury recovery.",
+
+    "Sandbox_BetterResting_BedMuscleFatigueReduction": "Bed muscle strain recovery",
+    "Sandbox_BetterResting_BedMuscleFatigueReduction_tooltip": "How quickly muscle stiffness / strain recovers while resting in bed.<LINE><LINE><RGB:0.8,0.8,0.8>Anchor points:<LINE>0.0 = no bonus<LINE>0.30 = default (moderate)<LINE>0.60 = strong<LINE>1.0 = max<LINE><LINE>Higher = faster strain recovery.",
+
+    "Sandbox_BetterResting_ShowMessages": "Show resting messages",
+    "Sandbox_BetterResting_ShowMessages_tooltip": "Show floating text when resting, gaining Well Rested, or when the buff fades."
+}
