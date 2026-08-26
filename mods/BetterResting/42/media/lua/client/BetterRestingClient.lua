@@ -47,7 +47,7 @@ end
 local restMessageData = {
     startTick = 0,
     message = nil,
-    duration = 600,
+    duration = 120,
     refreshInterval = 60,
     lastRefresh = 0
 }
